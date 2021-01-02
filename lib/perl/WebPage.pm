@@ -28,7 +28,7 @@ sub dispatch {
 
     my $code = $self->{actions}{$action}{code};
     if ($code) {
-        $code->($self);
+        return $code->($self);
     }
     else {
         $self->append("Non existent $action");
@@ -36,35 +36,44 @@ sub dispatch {
 }
 
 sub get_param {
-	my ($self, $param_name) = @_;
+    my ( $self, $param_name ) = @_;
 
-	return $self->{cgi}->param($param_name);
+    return $self->{cgi}->param($param_name);
 }
 
 sub append {
-	my ($self, $html) = @_;
+    my ( $self, $html ) = @_;
 
-	$self->{raw_content} .= $html;
+    $self->{raw_content} .= $html;
 }
 
 sub add_footer {
     my ($self) = @_;
 
-    $self->append .= '<br><hr>Nothing to see here, move along';
+    $self->append('<br><hr>Nothing to see here, move along');
 }
 
 sub add_section ($$$;$) {
-	my ($self, $title, $content, $is_html) = @_;
+    my ( $self, $title, $content, $is_html ) = @_;
 
-	my $text = qq{<table><border=0 width=95%'><TR><TD bgcolor=#ffddff>$title</td></tr>
-	<tr><td>$content</td></tr></table};
+    my $cr = ref $content;
+    if ( $cr = 'CODE' ) {
+        $content = $content->($self);
+    }
+    if ( not $is_html ) {
+        $content = "<pre>$content</pre>";
+    }
+    my $text =
+qq{<table border=0 style="width:100%"><TR><TD bgcolor=#aaffaa>$title</td></tr>
+	<tr><td>$content</td></tr></table>};
 
-	$self->append($text);
+    $self->append($text);
+
 }
 
 sub add_page {
-	my ($self, $action, $title, $function) = @_;
+    my ( $self, $action, $title, $function ) = @_;
 
-	$self->{actions}{$action} = {title => $title, code => $function};
+    $self->{actions}{$action} = { title => $title, code => $function };
 }
 1;

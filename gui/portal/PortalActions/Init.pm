@@ -19,6 +19,7 @@ sub init_libris {
 	my $page = WebPage::init();
 
 	$page->add_page($A_home, 'Home', \&home);
+	$page->add_page('debug', 'Debug', \&show_debug);
 	return $page;
 }
 
@@ -26,12 +27,13 @@ sub init_libris {
 sub show_debug {
 	my ($page) = @_;
 
-	$page->add_section('Debug Information', sub {return Dumper %ENV;});
+	$page->add_section('Debug Information', sub {return Dumper \%ENV;},0);
 }
 
 sub home {
 	my ($page) = @_;
-	$page->add_section('Home', sub { return 'Build home page here'});
+
+	$page->add_section('Home', sub { return 'Build home page here'}, 1);
 }
 
 1;
