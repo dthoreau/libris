@@ -11,7 +11,9 @@ use Data::Dumper;
 
 use lib q{/home/dominic/libris/lib/perl};
 use lib q{/home/dominic/libris/gui/portal};
+
 use WebPage;
+use Util qw{table_hash};
 
 my $A_home = 'home';
 
@@ -27,7 +29,7 @@ sub init_libris {
 sub show_debug {
 	my ($page) = @_;
 
-	$page->add_section('Debug Information', sub {return Dumper \%ENV;},0);
+	$page->add_section('Debug Information', sub {table_hash(\%ENV)},1);
 }
 
 sub home {

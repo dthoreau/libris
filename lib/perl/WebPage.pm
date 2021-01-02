@@ -1,6 +1,7 @@
 package WebPage;
 
 use CGI;
+use Util qw(true false);
 
 sub init {
     my $self = { cgi => CGI->new };
