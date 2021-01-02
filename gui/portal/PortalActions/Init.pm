@@ -15,13 +15,18 @@ use lib q{/home/dominic/libris/gui/portal};
 use WebPage;
 use Util qw{table_hash};
 
+use PortalActions::ISBN qw(init_isbn);
+
 my $A_home = 'home';
 
 sub init_libris {
 	my $page = WebPage::init();
 
+	init_isbn($page);
+
 	$page->add_page($A_home, 'Home', \&home);
 	$page->add_page('debug', 'Debug', \&show_debug);
+
 	return $page;
 }
 
@@ -33,9 +38,10 @@ sub show_debug {
 }
 
 sub home {
-	my ($page) = @_;
+    my ($page) = @_;
 
-	$page->add_section('Home', sub { return 'Build home page here'}, 1);
+    $page->add_section( 'Home', sub { return 'Build home page here' }, 1 );
+
 }
 
 1;

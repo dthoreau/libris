@@ -3,22 +3,52 @@ package WebPage;
 use CGI;
 use Util qw(true false);
 
+use DB;
+
+use Try::Tiny;
+
+$| = 1;
 sub init {
-    my $self = { cgi => CGI->new };
+    my $self = { cgi => CGI->new, disposition => 'text/html', db => DB->new() };
 
     bless $self;
 
     return $self;
 }
 
+sub db { my ($self) = @_; return $self->{db};}
+
 sub DESTROY {
     my ($self) = @_;
 
-    print "Content-type: text/html\n\n";
+    print "Content-type: $self->{disposition}\n\n";
 
     $self->add_footer();
 
     print $self->{raw_content};
+}
+
+sub build_headers {
+    my ($self) = @_;
+
+    my $head = qq{
+	<!-- meis libris - personal cloud based library management>
+    };
+}
+
+sub fatal ($$) {
+    my ($self, $text) = @_;
+
+    $self->{raw_content} = '';
+    my $message_text = "It appears something has gone wrong. <br>All we know is what we were
+	told, and in this case, that is as follows:<br>
+	<pre>$text</pre>
+	<br><br>Hopefully, this may shed some light on this unfortunate
+	situation";
+
+    $self->add_section("Error", $message_text, true);
+
+    die;
 }
 
 sub dispatch {
@@ -27,12 +57,20 @@ sub dispatch {
     my $action = $self->get_param('action');
     $action //= 'home';
 
+    $self->{action}= $action;
+
     my $code = $self->{actions}{$action}{code};
+
     if ($code) {
-        return $code->($self);
+        try {
+            return $code->($self);
+        }
+        catch {
+            fatal($self, $_);
+        };
     }
     else {
-        $self->append("Non existent $action");
+	fatal($self, "Non existent action '$action'");
     }
 }
 
@@ -51,14 +89,14 @@ sub append {
 sub add_footer {
     my ($self) = @_;
 
-    $self->append('<br><hr>Nothing to see here, move along');
+    $self->append("<br><hr>Nothing to see here, move along<br>\n");
 }
 
 sub add_section ($$$;$) {
     my ( $self, $title, $content, $is_html ) = @_;
 
     my $cr = ref $content;
-    if ( $cr = 'CODE' ) {
+    if ( $cr eq 'CODE' ) {
         $content = $content->($self);
     }
     if ( not $is_html ) {
@@ -77,4 +115,18 @@ sub add_page {
 
     $self->{actions}{$action} = { title => $title, code => $function };
 }
+
+sub make_link ($$;$) {
+    my ( $self, $action, $title ) = @_;
+
+    my $link = "?action=$action";
+
+    $title //= $self->{actions}{$action}{title};
+    $title //= $action;
+
+    my $html = "<A HREF=$link>$title</A>";
+
+    return $html;
+}
+
 1;
