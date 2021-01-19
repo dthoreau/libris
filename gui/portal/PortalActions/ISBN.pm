@@ -27,6 +27,9 @@ sub isbn_test {
     $page->add_section('book one', sub {Dumper $stub}, 0);
 
     $db->insert_single($stub);
+    my $records = $db->{namespace}->find({});
+
+    $page->my $records = $db->{namespace}->find({});
 }
 
 sub googleapi_to_internal {
