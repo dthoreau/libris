@@ -90,7 +90,7 @@ sub append {
 sub add_footer {
     my ($self) = @_;
 
-    $self->append("<br><hr>Nothing to see here, move along<br>\n");
+    $self->append("<br><hr><em>&copy; 2021 Reclaimed Software</em>\n");
 }
 
 sub add_section ($$$;$) {
@@ -122,14 +122,20 @@ sub view_multiple_rows ($$$$$) {
 sub make_table_from_query ($$$$) {
     my ( $self, $fields, $clauses, $params ) = @_;
 
-    my $db = $self->db;
+    my $db   = $self->db;
     my $rows = $db->match_many( $fields, $clauses, $params );
 
     my $return = '<table border=1>';
     if ( scalar @$rows ) {
+        $return .= '<tr>';
+        foreach my $field (@$fields) {
+            $return .= '<th>' . ucfirst $field . '</th>';
+
+        }
+        $return .= "</tr>\n";
         foreach my $row (@$rows) {
             $return .= '<tr>';
-            foreach my $field ( sort keys %$row ) {
+            foreach my $field ( @$fields ) {
                 $return .= "<td>$row->{$field}</td>";
             }
             $return .= '</tr>';

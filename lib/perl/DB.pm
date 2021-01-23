@@ -4,11 +4,15 @@ use warnings;
 use strict;
 
 use DBI;
+use Utils qw(true false);
+
+use Carp qw(confess);
 
 sub new {
-    my $db = DBI->connect("dbi:Pg:dbname=libris",'libris','',{AutoCommit => 1});
+    my $db =
+      DBI->connect( "dbi:Pg:dbname=libris", 'libris', '', { AutoCommit => 1 } );
 
-    my $self = { dbh => $db};
+    my $self = { dbh => $db };
 
     bless $self;
 
@@ -16,7 +20,7 @@ sub new {
 }
 
 sub insert_entry {
-    my ($self, $table, $values) = @_;
+    my ( $self, $table, $values ) = @_;
 
     my $db = $self->{dbh};
 
@@ -25,43 +29,68 @@ sub insert_entry {
     my @fields;
 
     foreach my $field (@fnames) {
-	push @qlist, '?';
-	push @fields, $values->{$field};
+        push @qlist,  '?';
+        push @fields, $values->{$field};
     }
-    my $sql = "INSERT INTO $table (" . join(', ', @fnames) . " ) values ( ".  join(', ', @qlist) . ' )';
+    my $sql =
+        "INSERT INTO $table ("
+      . join( ', ', @fnames )
+      . " ) values ( "
+      . join( ', ', @qlist ) . ' )';
 
-    my $rv = [$sql, $values];
-
-    my $csr = $db->prepare($sql) ;
-    push @$rv,  $csr->execute(@fields);
-
-    return $rv;
-
-
-
-
-
+    my $csr = $db->prepare($sql);
+    return  $csr->execute(@fields);
 }
 
-
 sub match_many ($$$$) {
-    my ($self, $fields, $clauses, $params) = @_;
+    my ( $self, $fields, $clauses, $params ) = @_;
 
     my $db = $self->{dbh};
 
-    my ($sql, $param_array) = _build_select_query($fields, $clauses, $params);
+    my ( $sql, $param_array ) =
+      _build_select_query( $fields, $clauses, $params );
 
-#    return [{sql=>$sql, array => @$param_array}];
-    my $csr=$db->prepare($sql) || fatal $!;
-    $csr->execute(@$param_array);
+    my $csr = $db->prepare($sql) || confess $!;
+    $csr->execute(@$param_array) || confess $!;
 
-#    return $csr->errstr;
-#    return $csr->rows;
     my $rows = [];
-    while (my $row = $csr->fetchrow_hashref) {
-	push @$rows, $row;
+    while ( my $row = $csr->fetchrow_hashref ) {
+        push @$rows, $row;
     }
     return $rows;
+}
+
+sub match_optional_single ($$$$) {
+    my ( $self, $fields, $clauses, $params, $opt ) = @_;
+
+    return $self->match_single( $fields, $clauses, $params, true );
+}
+
+sub match_tuple ($$$$) {
+    my ( $self, $fields, $clauses, $params, $opt ) = @_;
+
+    if (! wantarray) {
+		confess( 'Not called in array context');
+    }
+
+    return @{$self->match_single( $fields, $clauses, $params )};
+}
+
+sub match_single ($$$$;$) {
+    my ( $self, $fields, $clauses, $params, $opt ) = @_;
+
+    $opt //= false;
+
+    my $rows = $self->match_many( $fields, $clauses, $params );
+
+    my $row_count = scalar @$rows;
+    if ( $row_count == 0 ) {
+        confess("1 row expected, zero returned") unless $opt;
+    }
+    elsif ( $row_count > 1 ) {
+        confess ("1 row expected, $row_count returned");
+    }
+    return $rows->[0];
 }
 
 sub _build_select_query {
@@ -70,20 +99,20 @@ sub _build_select_query {
     my ($table) = split /\./, $fields->[0];
 
     my $param_array = [];
-    my $sql = 'SELECT ' . join( ' ,', @$fields ) . " FROM $table ";
+    my $sql         = 'SELECT ' . join( ', ', @$fields ) . " FROM $table ";
 
     my $cc = 0;
     foreach my $clause (@$clauses) {
-	$cc ++;
-	if ($clause =~ /^(.*)\s\%(\w*)\s?$/) {
-	    $clause = "$1 ?";
-	    push @$param_array, $params->{$2};
-	}
+        $cc++;
+        if ( $clause =~ /^(.*)\s\%(\w*)\s?$/ ) {
+            $clause = "$1 ?";
+            push @$param_array, $params->{$2};
+        }
     }
 
     if ($cc) { $sql = "$sql WHERE " . join ' AND ', @$clauses; }
 
-    return ($sql, $param_array);
+    return ( $sql, $param_array );
 }
 
 1;

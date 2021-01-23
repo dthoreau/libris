@@ -26,16 +26,46 @@ sub isbn_test {
     my $stub = googleapi_to_internal( fake_data() );
     $page->add_section( 'book one', sub { Dumper $stub}, 0 );
 
+    add_book( $db, $stub );
     foreach my $auth ( @{ $stub->{authors} } ) {
         my $record = { name => $auth };
 
-#        $page->add_section( 'insert',
-#            sub { Dumper $db->insert_entry( 'authors', $record ) } );
     }
-    $page->view_multiple_rows(['authors.id', 'name'],['id > %max'],{max => 10}, 'Author list');
-    $page->view_multiple_rows(['authors.id', 'name'],[],{}, 'Author list');
+    $page->view_multiple_rows( [ 'books.title', 'pages', 'publication_year',
+	    'description' ],
+        [], {}, 'Book List' );
+    $page->view_multiple_rows( [ 'authors.id', 'name' ], [], {},
+        'Author list' );
+}
 
+sub add_book ($$) {
+    my ($db, $data) = @_;
 
+    my $existing_book =
+      $db->match_optional_single( ['books.id'], ['title = %title'],
+        { title => $data->{title} } );
+
+    return $existing_book->{id} if $existing_book;
+
+    my $book = {title => $data->{title},
+	publication_year => $data->{publishedDate},
+	    pages => $data->{pageCount},
+	    description => $data->{description}
+    };
+
+    my $book_id = $db->insert_entry('books', $book);
+}
+
+sub add_author ($$) {
+    my ( $db, $name ) = @_;
+
+    my $existing_author =
+      $db->match_optional_single( ['authors.id'], ['name = %name'],
+        { name => $name } );
+
+    return $existing_author->{id} if $existing_author;
+
+    return $db->insert_entry( 'authors', { name => $name } );
 }
 
 sub googleapi_to_internal {
@@ -45,7 +75,7 @@ sub googleapi_to_internal {
     my $return = {};
 
     my $keep_fields = [qw{printType publishedDate pageCount maturityRating
-	language title categories}];
+	language title categories description}];
 
     foreach my $key ( @$keep_fields) {
         $return->{$key} = $item->{$key};
