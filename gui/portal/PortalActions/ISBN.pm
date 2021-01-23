@@ -22,14 +22,20 @@ sub init_isbn {
 sub isbn_test {
     my ($page) = @_;
 
-    my $db = $page->db;
-    my $stub = googleapi_to_internal(fake_data());
-    $page->add_section('book one', sub {Dumper $stub}, 0);
+    my $db   = $page->db;
+    my $stub = googleapi_to_internal( fake_data() );
+    $page->add_section( 'book one', sub { Dumper $stub}, 0 );
 
-    $db->insert_single($stub);
-    my $records = $db->{namespace}->find({});
+    foreach my $auth ( @{ $stub->{authors} } ) {
+        my $record = { name => $auth };
 
-    $page->my $records = $db->{namespace}->find({});
+#        $page->add_section( 'insert',
+#            sub { Dumper $db->insert_entry( 'authors', $record ) } );
+    }
+    $page->view_multiple_rows(['authors.id', 'name'],['id > %max'],{max => 10}, 'Author list');
+    $page->view_multiple_rows(['authors.id', 'name'],[],{}, 'Author list');
+
+
 }
 
 sub googleapi_to_internal {
@@ -45,12 +51,11 @@ sub googleapi_to_internal {
         $return->{$key} = $item->{$key};
     }
 
-    $return->{authors} = join( ', ', @{$item->{authors} });
+    $return->{authors} = $item->{authors} ;
 
     return $return;
 
 }
-
 
 sub fake_data {
     my $json = q{{

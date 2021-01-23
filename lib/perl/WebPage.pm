@@ -4,6 +4,7 @@ use CGI;
 use Util qw(true false);
 
 use DB;
+use Data::Dumper;
 
 use Try::Tiny;
 
@@ -108,6 +109,38 @@ qq{<table border=0 style="width:100%"><TR><TD bgcolor=#aaffaa>$title</td></tr>
 
     $self->append($text);
 
+}
+
+sub view_multiple_rows ($$$$$) {
+    my ($self, $fields, $clauses, $params, $title) = @_;
+
+    $self->add_section($title, sub { make_table_from_query($self, $fields,
+		$clauses, $params);}, true);
+
+}
+
+sub make_table_from_query ($$$$) {
+    my ( $self, $fields, $clauses, $params ) = @_;
+
+    my $db = $self->db;
+    my $rows = $db->match_many( $fields, $clauses, $params );
+
+    my $return = '<table border=1>';
+    if ( scalar @$rows ) {
+        foreach my $row (@$rows) {
+            $return .= '<tr>';
+            foreach my $field ( sort keys %$row ) {
+                $return .= "<td>$row->{$field}</td>";
+            }
+            $return .= '</tr>';
+        }
+    }
+    else {
+        $return .= '<tr><TD><em>No rows returned</td></tr>';
+    }
+    $return .= '</table>';
+
+    return $return;
 }
 
 sub add_page {

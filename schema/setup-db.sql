@@ -23,4 +23,4 @@ create table authorship (
 
 
 
-rollback;
+commit;
