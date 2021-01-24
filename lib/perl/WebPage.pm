@@ -17,7 +17,9 @@ sub init {
     return $self;
 }
 
-sub db { my ($self) = @_; return $self->{db};}
+sub db { my ($self) = @_; return $self->{db}; }
+
+sub note { my ( $self, $text ) = @_; $self->{notes} .= "$text\n---\n"; }
 
 sub DESTROY {
     my ($self) = @_;
@@ -27,6 +29,9 @@ sub DESTROY {
     $self->add_footer();
 
     print $self->{raw_content};
+    if ($self->{notes}) {
+	print "<hr><em>Notes:</em><br><pre>$self->{notes}</pre>\n";
+    }
 }
 
 sub build_headers {
@@ -127,15 +132,20 @@ sub make_table_from_query ($$$$) {
 
     my $return = '<table border=1>';
     if ( scalar @$rows ) {
+
         $return .= '<tr>';
         foreach my $field (@$fields) {
-            $return .= '<th>' . ucfirst $field . '</th>';
+	    $field = _last_dot($field);
+	    my $dis = convert_label($field);
+            $return .= "<th>$dis</th>";
 
         }
+
         $return .= "</tr>\n";
         foreach my $row (@$rows) {
             $return .= '<tr>';
             foreach my $field ( @$fields ) {
+		$field = _last_dot($field);
                 $return .= "<td>$row->{$field}</td>";
             }
             $return .= '</tr>';
@@ -147,6 +157,27 @@ sub make_table_from_query ($$$$) {
     $return .= '</table>';
 
     return $return;
+}
+
+sub convert_label($) {
+    my ($s) = @_;
+
+    $s =~ s/_/ /g;
+    my $r = [];
+
+    foreach my $w ( split /\s/, $s ) {
+        push @$r, ucfirst $w;
+    }
+    return join(' ', @$r);
+}
+
+sub _last_dot ($) {
+    my ($string) =@_;
+
+    my $pieces = [split /\./, $string];
+    my $count = scalar @$piecees;
+
+    return $pieces->[$count-1];
 }
 
 sub add_page {

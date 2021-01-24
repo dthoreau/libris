@@ -50,8 +50,8 @@ sub match_many ($$$$) {
     my ( $sql, $param_array ) =
       _build_select_query( $fields, $clauses, $params );
 
-    my $csr = $db->prepare($sql) || confess $!;
-    $csr->execute(@$param_array) || confess $!;
+    my $csr = $db->prepare($sql) || fatal( $db->errstr );
+    $csr->execute(@$param_array) || fatal($db->errstr);
 
     my $rows = [];
     while ( my $row = $csr->fetchrow_hashref ) {
@@ -70,7 +70,7 @@ sub match_tuple ($$$$) {
     my ( $self, $fields, $clauses, $params, $opt ) = @_;
 
     if (! wantarray) {
-		confess( 'Not called in array context');
+		fatal('Not called in array context');
     }
 
     return @{$self->match_single( $fields, $clauses, $params )};
@@ -113,6 +113,14 @@ sub _build_select_query {
     if ($cc) { $sql = "$sql WHERE " . join ' AND ', @$clauses; }
 
     return ( $sql, $param_array );
+}
+
+sub fatal ($) {
+    my ($message) = @_;
+
+    $message .= "\n";
+
+    confess $message;
 }
 
 1;

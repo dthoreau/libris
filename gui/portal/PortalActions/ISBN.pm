@@ -31,7 +31,8 @@ sub isbn_test {
         my $record = { name => $auth };
 
     }
-    $page->view_multiple_rows( [ 'books.title', 'pages', 'publication_year',
+    $page->view_multiple_rows( [ 'books.id', 'title', 'pages',
+	    'publication_year',
 	    'description' ],
         [], {}, 'Book List' );
     $page->view_multiple_rows( [ 'authors.id', 'name' ], [], {},
@@ -75,7 +76,7 @@ sub googleapi_to_internal {
     my $return = {};
 
     my $keep_fields = [qw{printType publishedDate pageCount maturityRating
-	language title categories description}];
+	language title categories description industryIdentifiers}];
 
     foreach my $key ( @$keep_fields) {
         $return->{$key} = $item->{$key};
