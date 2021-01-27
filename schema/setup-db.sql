@@ -7,7 +7,7 @@ create sequence books_seq start 1;
 create table books (
 	id integer primary key not null default nextval('books_seq'),
 	title text not null,
-	publication_year numeric(4) not null,
+	publication_date text not null,
 	pages int ,
 	description text);
 

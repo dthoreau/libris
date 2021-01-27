@@ -38,8 +38,8 @@ sub insert_entry {
       . " ) values ( "
       . join( ', ', @qlist ) . ' )';
 
-    my $csr = $db->prepare($sql);
-    return  $csr->execute(@fields);
+    my $csr = $db->prepare($sql) || fatal($db->errstr);
+    return  $csr->execute(@fields) || fatal($db->errstr);
 }
 
 sub match_many ($$$$) {
