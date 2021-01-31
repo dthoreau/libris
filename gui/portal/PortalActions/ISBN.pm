@@ -75,7 +75,7 @@ sub isbn_test {
 
         my $stub = googleapi_to_internal($data);
 
-        my $book_id = add_book( $db, $stub );
+        my $book_id = add_book( $page, $stub );
     }
 
     $page->view_multiple_rows(
@@ -86,8 +86,9 @@ sub isbn_test {
 }
 
 sub add_book ($$) {
-    my ( $db, $data ) = @_;
+    my ( $page, $data ) = @_;
 
+    my $db = $page->db;
     if ( !defined $data->{title} ) { return; }
     my $book_id;
 
@@ -110,22 +111,23 @@ sub add_book ($$) {
         $book_id = $existing_book->{id};
     }
 
-    foreach my $identifier ( @{ $data->{IndustryIdentifiers} } ) {
+    foreach my $identifier ( @{ $data->{industryIdentifiers} } ) {
         my $isbn  = $identifier->{identifier};
         my $type  = $identifier->{type};
-        my $class = ( $type eq 'ISBN_!0' ) ? 1 : 2;
+        my $class = ( $type eq 'ISBN_10' ) ? 1 : 2;
 
-        $db->insert_entry(
-            'book_identifier',
-            {
-                book            => $book_id,
-                identifier_type => $class,
-                identifier      => $isbn
-            }
-        );
+        my $record = {
+            book            => $book_id,
+            identifier_type => $class,
+            identifier      => $isbn,
+        };
+
+        $db->insert_entry( 'book_identifier', $record);
     }
 
+    $page->note(Dumper $data->{authors});
     foreach my $author ( @{ $data->{authors} } ) {
+
         my $existing_author =
           $db->match_optional_single( ['authors.id'], ['name = %name'],
             { name => $author } );
@@ -135,13 +137,14 @@ sub add_book ($$) {
           ? $existing_author->{id}
           : $db->insert_entry( 'authors', { name => $author } );
 
-        $db->insert_entry(
-            'authorship',
-            {
+	  my $record = {
                 book   => $book_id,
                 author => $ex_auth_id
-            }
-        );
+            };
+
+	  $page->note(Dumper $record);
+
+        $db->insert_entry( 'authorship', $record);
 
     }
 
