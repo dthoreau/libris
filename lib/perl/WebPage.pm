@@ -16,6 +16,13 @@ $| = 1;
 sub init {
     my $self = { cgi => CGI->new, disposition => 'text/html', db => DB->new() };
 
+    open( my $TMPL, '<',
+        '../..//gui/portal/web/templates/base.tmpl' ) || die $!;
+    my @template = <$TMPL>;
+    close $TMPL || die $1;
+
+    $self->{template} = join '', @template;
+
     bless $self;
 
     return $self;
@@ -30,12 +37,16 @@ sub DESTROY {
 
     print "Content-type: $self->{disposition}\n\n";
 
-    $self->add_footer();
+    my $template = $self->{template};
 
-    print $self->{raw_content};
     if ( $self->{notes} ) {
-        print "<hr><em>Notes:</em><br><pre>$self->{notes}</pre>\n";
+        $self->{raw_content} .=
+          "<hr><em>Notes:</em><br><pre>$self->{notes}</pre>\n";
     }
+
+    $template =~ s/<!-- CONTENT -->/$self->{raw_content}/e;
+
+    print $template;
 }
 
 sub build_headers {

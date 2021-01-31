@@ -85,31 +85,26 @@ sub isbn_test {
         'Author list' );
 }
 
+## Please see file perltidy.ERR
 sub add_book ($$) {
     my ( $page, $data ) = @_;
 
     my $db = $page->db;
     if ( !defined $data->{title} ) { return; }
-    my $book_id;
 
-    my $existing_book =
-      $db->match_optional_single( ['books.id'], ['title = %title'],
-        { title => $data->{title} } );
+    my $book = {
+        title            => $data->{title},
+        publication_date => $data->{publishedDate},
+        pages            => $data->{pageCount},
+        description      => $data->{description}
+    };
 
-    if ( !exists $existing_book->{id} ) {
+    my $book_record = $db->match_optional_single( ['books.id'],
+        [ 'title = %title', 'pages = %pages' ], $book );
 
-        my $book = {
-            title            => $data->{title},
-            publication_date => $data->{publishedDate},
-            pages            => $data->{pageCount},
-            description      => $data->{description}
-        };
-
-        $book_id = $db->insert_entry( 'books', $book );
-    }
-    else {
-        $book_id = $existing_book->{id};
-    }
+    my $book_id = ( $book_record->{id} )
+      ? $book_record->{id}
+      : $db->insert_entry( 'books', $book );
 
     foreach my $identifier ( @{ $data->{industryIdentifiers} } ) {
         my $isbn  = $identifier->{identifier};
@@ -122,10 +117,9 @@ sub add_book ($$) {
             identifier      => $isbn,
         };
 
-        $db->insert_entry( 'book_identifier', $record);
+        $db->insert_entry( 'book_identifier', $record );
     }
 
-    $page->note(Dumper $data->{authors});
     foreach my $author ( @{ $data->{authors} } ) {
 
         my $existing_author =
@@ -133,19 +127,16 @@ sub add_book ($$) {
             { name => $author } );
 
         my $ex_auth_id =
-          ( exists $existing_author->{id} )
+          ( $existing_author->{id} )
           ? $existing_author->{id}
           : $db->insert_entry( 'authors', { name => $author } );
 
-	  my $record = {
-                book   => $book_id,
-                author => $ex_auth_id
-            };
+        my $record = {
+            book   => $book_id,
+            author => $ex_auth_id
+        };
 
-	  $page->note(Dumper $record);
-
-        $db->insert_entry( 'authorship', $record);
-
+        $db->insert_entry( 'authorship', $record );
     }
 
     return $book_id;

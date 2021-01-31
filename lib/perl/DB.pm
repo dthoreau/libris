@@ -41,7 +41,7 @@ sub insert_entry {
     my $csr = $db->prepare($sql)     || fatal( $db->errstr );
     my $id  = $csr->execute(@fields) || fatal( $db->errstr );
 
-    return $id;
+    return $db->last_insert_id(undef, undef, $table, undef);
 }
 
 sub match_many ($$$$) {

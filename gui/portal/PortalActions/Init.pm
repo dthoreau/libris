@@ -40,7 +40,7 @@ sub show_debug {
 sub home {
     my ($page) = @_;
 
-    $page->add_section( 'Home', sub { return 'Build home page here' }, 1 );
+    $page->add_section( 'Home', sub { return 'Build home page here' }, 0 );
 
 }
 
