@@ -1,5 +1,8 @@
 package WebPage;
 
+use strict;
+use warnings;
+
 use CGI;
 use Util qw(true false);
 
@@ -9,6 +12,7 @@ use Data::Dumper;
 use Try::Tiny;
 
 $| = 1;
+
 sub init {
     my $self = { cgi => CGI->new, disposition => 'text/html', db => DB->new() };
 
@@ -29,8 +33,8 @@ sub DESTROY {
     $self->add_footer();
 
     print $self->{raw_content};
-    if ($self->{notes}) {
-	print "<hr><em>Notes:</em><br><pre>$self->{notes}</pre>\n";
+    if ( $self->{notes} ) {
+        print "<hr><em>Notes:</em><br><pre>$self->{notes}</pre>\n";
     }
 }
 
@@ -43,16 +47,17 @@ sub build_headers {
 }
 
 sub fatal ($$) {
-    my ($self, $text) = @_;
+    my ( $self, $text ) = @_;
 
     $self->{raw_content} = '';
-    my $message_text = "It appears something has gone wrong. <br>All we know is what we were
+    my $message_text =
+      "It appears something has gone wrong. <br>All we know is what we were
 	told, and in this case, that is as follows:<br>
 	<pre>$text</pre>
 	<br><br>Hopefully, this may shed some light on this unfortunate
 	situation";
 
-    $self->add_section("Error", $message_text, true);
+    $self->add_section( "Error", $message_text, true );
 
     die;
 }
@@ -63,7 +68,7 @@ sub dispatch {
     my $action = $self->get_param('action');
     $action //= 'home';
 
-    $self->{action}= $action;
+    $self->{action} = $action;
 
     my $code = $self->{actions}{$action}{code};
 
@@ -72,11 +77,11 @@ sub dispatch {
             return $code->($self);
         }
         catch {
-            fatal($self, $_);
+            fatal( $self, $_ );
         };
     }
     else {
-	fatal($self, "Non existent action '$action'");
+        fatal( $self, "Non existent action '$action'" );
     }
 }
 
@@ -117,10 +122,48 @@ qq{<table border=0 style="width:100%"><TR><TD bgcolor=#aaffaa>$title</td></tr>
 }
 
 sub view_multiple_rows ($$$$$) {
-    my ($self, $fields, $clauses, $params, $title) = @_;
+    my ( $self, $fields, $clauses, $params, $title ) = @_;
 
-    $self->add_section($title, sub { make_table_from_query($self, $fields,
-		$clauses, $params);}, true);
+    $self->add_section(
+        $title,
+        sub {
+            make_table_from_query( $self, $fields, $clauses, $params );
+        },
+        true
+    );
+}
+
+sub hash_to_table {
+    my ( $self, $hash, $fields ) = @_;
+
+    my $return = '<table>';
+    foreach my $field (@$fields) {
+        $field = _last_dot($field);
+        $return .= "<tr><th>$field</th><td>$hash->{$field}</td></tr>";
+    }
+    $return .= '</table>';
+
+    return $return;
+}
+
+sub view_single_row {
+    my ( $self, $table, $id ) = @_;
+
+    my $db = $self->db;
+
+    $self->add_section(
+        'Single Row',
+        sub {
+            my $fields        = $self->{Tables}{$table}{ViewFields};
+            my $canned_fields = $self->{Tables}{$table}{ViewFields};
+
+            $fields->[0] = "$table.$fields->[0]";
+            my $row = $db->match_single( $fields, 'id = %id', $id );
+            return $self->hash_to_table( $row, $canned_fields );
+
+        },
+        true
+    );
 
 }
 
@@ -135,8 +178,8 @@ sub make_table_from_query ($$$$) {
 
         $return .= '<tr>';
         foreach my $field (@$fields) {
-	    $field = _last_dot($field);
-	    my $dis = convert_label($field);
+            $field = _last_dot($field);
+            my $dis = convert_label($field);
             $return .= "<th>$dis</th>";
 
         }
@@ -144,8 +187,8 @@ sub make_table_from_query ($$$$) {
         $return .= "</tr>\n";
         foreach my $row (@$rows) {
             $return .= '<tr>';
-            foreach my $field ( @$fields ) {
-		$field = _last_dot($field);
+            foreach my $field (@$fields) {
+                $field = _last_dot($field);
                 $return .= "<td>$row->{$field}</td>";
             }
             $return .= '</tr>';
@@ -168,16 +211,16 @@ sub convert_label($) {
     foreach my $w ( split /\s/, $s ) {
         push @$r, ucfirst $w;
     }
-    return join(' ', @$r);
+    return join( ' ', @$r );
 }
 
 sub _last_dot ($) {
-    my ($string) =@_;
+    my ($string) = @_;
 
-    my $pieces = [split /\./, $string];
-    my $count = scalar @$piecees;
+    my $pieces = [ split /\./, $string ];
+    my $count  = scalar @$pieces;
 
-    return $pieces->[$count-1];
+    return $pieces->[ $count - 1 ];
 }
 
 sub add_page {
@@ -197,6 +240,40 @@ sub make_link ($$;$) {
     my $html = "<A HREF=$link>$title</A>";
 
     return $html;
+}
+
+sub register_table ($$$) {
+    my ( $self, $table_name, $details ) = @_;
+
+    my $uc_tn = ucfirst $table_name;
+    $self->{Tables}{$table_name} = $details;
+
+    $self->add_page( "list-$table_name", "List $uc_tn",
+        sub { $self->automatic_list_page($table_name); } );
+
+    $self->add_page( "view-$table_name", "View $uc_tn",
+        sub { $self->automatic_view_page($table_name) } );
+}
+
+sub automatic_list_page ($$) {
+    my ( $self, $table ) = @_;
+
+    my $fields = $self->{Tables}{$table}{ListFields};
+    $fields->[0] = "$table.$fields->[0]";
+
+    $self->view_multiple_rows( $fields, [], {}, ucfirst $table );
+}
+
+sub automatic_view_page {
+    my ( $self, $table ) = @_;
+
+    my $id = $self->{cgi}->param('id');
+
+    $self->view_single_row( $table, $id );
+    if ( exists $self->{Tables}{$table}{PostView} ) {
+        my $func = $self->{Tables}{$table}{PostView};
+        $func->( $self, $id );
+    }
 }
 
 1;

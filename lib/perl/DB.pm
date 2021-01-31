@@ -53,7 +53,7 @@ sub match_many ($$$$) {
       _build_select_query( $fields, $clauses, $params );
 
     my $csr = $db->prepare($sql) || fatal( $db->errstr );
-    $csr->execute(@$param_array) || fatal($db->errstr);
+    $csr->execute(@$param_array) || fatal( $db->errstr );
 
     my $rows = [];
     while ( my $row = $csr->fetchrow_hashref ) {
@@ -71,11 +71,11 @@ sub match_optional_single ($$$$) {
 sub match_tuple ($$$$) {
     my ( $self, $fields, $clauses, $params, $opt ) = @_;
 
-    if (! wantarray) {
-		fatal('Not called in array context');
+    if ( !wantarray ) {
+        fatal('Not called in array context');
     }
 
-    return @{$self->match_single( $fields, $clauses, $params )};
+    return @{ $self->match_single( $fields, $clauses, $params ) };
 }
 
 sub match_single ($$$$;$) {
@@ -90,13 +90,16 @@ sub match_single ($$$$;$) {
         confess("1 row expected, zero returned") unless $opt;
     }
     elsif ( $row_count > 1 ) {
-        confess ("1 row expected, $row_count returned");
+        confess("1 row expected, $row_count returned");
     }
     return $rows->[0];
 }
 
 sub _build_select_query {
     my ( $fields, $clauses, $params ) = @_;
+
+    $clauses = ( ref $clauses eq 'ARRAY' ) ? $clauses : [$clauses];
+    $params  = ( ref $params eq 'HASH' )   ? $params  : { id => $params };
 
     my ($table) = split /\./, $fields->[0];
 

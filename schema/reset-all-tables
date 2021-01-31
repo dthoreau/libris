@@ -1,0 +1,2 @@
+psql libris -U libris -f undo-setup-db.sql
+psql libris -U libris -f setup-db.sql

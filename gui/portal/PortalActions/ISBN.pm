@@ -22,7 +22,30 @@ my $C_ISBN_13 = 2;
 sub init_isbn {
     my ($page) = @_;
 
+    add_table_books($page);
+
     $page->add_page( $A_isbn_test, 'ISBN Test', \&isbn_test );
+}
+
+sub add_table_books ($) {
+    my ($page) = @_;
+
+    $page->register_table(
+        'books',
+        {
+            ListFields => [qw(title publication_date)],
+            ViewFields => [qw(title publication_date pages description)],
+            EditFields => [qw(title publication_date pages description)],
+            PostView   => \&books_post_view,
+        }
+    );
+}
+
+sub books_post_view {
+    my ( $page, $id ) = @_;
+
+    $page->add_section( 'Note', sub { return 'Generate author list here'; },
+        0 );
 }
 
 sub isbn_test {
@@ -32,21 +55,29 @@ sub isbn_test {
 
     my $fetcher = Fetch->new();
 
+    # TODO Just some sample books from my library.
+    my $books = [
+        qw(
+          9780330323123
+          9780857536020
+          9781590593899
+          9781937785567
+          9781521823637
+          9781910463871
+          )
+    ];
+
     $fetcher->store_url( 'isbn',
         'https://www.googleapis.com/books/v1/volumes?q=isbn:%s' );
 
-    my $data = $fetcher->retrieve_json( 'isbn', [9780857536020 ] );
+    foreach my $b (@$books) {
+        my $data = $fetcher->retrieve_json( 'isbn', [$b] );
 
-    $page->add_section( 'Fetched Data', sub { Dumper $data} );
+        my $stub = googleapi_to_internal($data);
 
-    my $stub = googleapi_to_internal($data);
-    $page->add_section( 'book one', sub { Dumper $stub}, 0 );
-
-    my $book_id = add_book( $db, $stub );
-    $page->add_section( 'note', sub { Dumper $book_id; } );
-    foreach my $auth ( @{ $stub->{authors} } ) {
-        my $record = { name => $auth };
+        my $book_id = add_book( $db, $stub );
     }
+
     $page->view_multiple_rows(
         [ 'books.id', 'title', 'pages', 'publication_date', 'description' ],
         [], {}, 'Book List' );
@@ -57,13 +88,14 @@ sub isbn_test {
 sub add_book ($$) {
     my ( $db, $data ) = @_;
 
+    if ( !defined $data->{title} ) { return; }
     my $book_id;
 
     my $existing_book =
       $db->match_optional_single( ['books.id'], ['title = %title'],
         { title => $data->{title} } );
 
-    if ( !$existing_book->{id} ) {
+    if ( !exists $existing_book->{id} ) {
 
         my $book = {
             title            => $data->{title},
@@ -76,7 +108,6 @@ sub add_book ($$) {
     }
     else {
         $book_id = $existing_book->{id};
-        return $book_id;
     }
 
     foreach my $identifier ( @{ $data->{IndustryIdentifiers} } ) {
@@ -84,8 +115,9 @@ sub add_book ($$) {
         my $type  = $identifier->{type};
         my $class = ( $type eq 'ISBN_!0' ) ? 1 : 2;
 
-        $db->insert_entry( 'book_identifier',
-	    {
+        $db->insert_entry(
+            'book_identifier',
+            {
                 book            => $book_id,
                 identifier_type => $class,
                 identifier      => $isbn
