@@ -15,6 +15,10 @@ use Fetch;
 
 my $A_isbn_test = 'isbn-test';
 
+# TODO should be library, really
+my $C_ISBN_10 = 1;
+my $C_ISBN_13 = 2;
+
 sub init_isbn {
     my ($page) = @_;
 
@@ -53,20 +57,61 @@ sub isbn_test {
 sub add_book ($$) {
     my ( $db, $data ) = @_;
 
+    my $book_id;
+
     my $existing_book =
       $db->match_optional_single( ['books.id'], ['title = %title'],
         { title => $data->{title} } );
 
-    return $existing_book->{id} if $existing_book;
+    if ( !$existing_book->{id} ) {
 
-    my $book = {
-        title            => $data->{title},
-        publication_date => $data->{publishedDate},
-        pages            => $data->{pageCount},
-        description      => $data->{description}
-    };
+        my $book = {
+            title            => $data->{title},
+            publication_date => $data->{publishedDate},
+            pages            => $data->{pageCount},
+            description      => $data->{description}
+        };
 
-    my $book_id = $db->insert_entry( 'books', $book );
+        $book_id = $db->insert_entry( 'books', $book );
+    }
+    else {
+        $book_id = $existing_book->{id};
+        return $book_id;
+    }
+
+    foreach my $identifier ( @{ $data->{IndustryIdentifiers} } ) {
+        my $isbn  = $identifier->{identifier};
+        my $type  = $identifier->{type};
+        my $class = ( $type eq 'ISBN_!0' ) ? 1 : 2;
+
+        $db->insert_entry( 'book_identifier',
+	    {
+                book            => $book_id,
+                identifier_type => $class,
+                identifier      => $isbn
+            }
+        );
+    }
+
+    foreach my $author ( @{ $data->{authors} } ) {
+        my $existing_author =
+          $db->match_optional_single( ['authors.id'], ['name = %name'],
+            { name => $author } );
+
+        my $ex_auth_id =
+          ( exists $existing_author->{id} )
+          ? $existing_author->{id}
+          : $db->insert_entry( 'authors', { name => $author } );
+
+        $db->insert_entry(
+            'authorship',
+            {
+                book   => $book_id,
+                author => $ex_auth_id
+            }
+        );
+
+    }
 
     return $book_id;
 }
