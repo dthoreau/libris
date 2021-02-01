@@ -125,7 +125,7 @@ sub add_section ($$$;$) {
         $content = "<pre>$content</pre>";
     }
     my $text =
-qq{<table border=0 style="width:100%"><TR><TD bgcolor=#aaffaa>$title</td></tr>
+qq{<table><TR><TD class='section'>$title</td></tr>
 	<tr><td>$content</td></tr></table>};
 
     $self->append($text);
@@ -184,7 +184,7 @@ sub make_table_from_query ($$$$) {
     my $db   = $self->db;
     my $rows = $db->match_many( $fields, $clauses, $params );
 
-    my $return = '<table border=1>';
+    my $return = '<table>';
     if ( scalar @$rows ) {
 
         $return .= '<tr>';
