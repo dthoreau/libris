@@ -110,12 +110,6 @@ sub append {
     $self->{raw_content} .= $html;
 }
 
-sub add_footer {
-    my ($self) = @_;
-
-    $self->append("<br><hr><em>&copy; 2021 Reclaimed Software</em>\n");
-}
-
 sub add_section ($$$;$) {
     my ( $self, $title, $content, $is_html ) = @_;
 
@@ -155,7 +149,6 @@ sub build_generic_fspecs ($$) {
     }
     return $fspec;
 }
-
 
 sub display_multiple_rows {
     my ($self, $data, $fields, $title, $specs) = @_;
@@ -199,38 +192,35 @@ sub view_single_row {
 
 }
 
-sub make_table_from_rows  ($$$$) {
-    my ($self, $rows, $fspecs) = @_;
+sub make_table_from_rows ($$$$) {
+    my ( $self, $rows, $fspecs ) = @_;
 
-    $self->note(Dumper $fspecs);
     my $field_list = $fspecs->{_field_list};
 
     my $return = '<table>';
     if ( scalar @$rows ) {
-	$return .= '<tr>';
+        $return .= '<tr>';
         foreach my $field (@$field_list) {
             $field = _last_dot($field);
 
             my $dis = convert_label($field);
             $return .= "<th>$dis</th>";
         }
-	$return .='</tr>';
-	foreach my $row (@$rows) {
-	    $return .= '<tr>';
-	    foreach my $field (@$field_list) {
-		$return .= $self->render_cell($row->{$field}, $fspecs->{$field});
-	    }
-	    $return .= '</tr>'
+        $return .= '</tr>';
+        foreach my $row (@$rows) {
+            $return .= '<tr>';
+            foreach my $field (@$field_list) {
+                $return .= render_cell( $field, $row, $fspecs->{$field} );
+            }
+            $return .= '</tr>';
 
-
-	}
+        }
 
     }
     else {
         $return .= '<tr><TD><em>No rows returned</td></tr>';
     }
     $return .= '</table>';
-    $self->note(Dumper $rows);
 
     return $return;
 }
@@ -310,12 +300,13 @@ sub automatic_view_page {
 }
 
 sub render_cell($$$) {
-    my ($self, $value, $spec) = @_;
+    my ($field, $row, $spec) = @_;
 
-    $self->note(Dumper $spec);
     my $render = $spec->{render};
+    my $class = $spec->{class};
+    my $r_class = ($class) ? " class=$class": '';
     $render //= \&fl_default;
-    return '<td>' . $render->($value).'</td>';
+    return "<td$r_class>" . $render->($row->{$field}).'</td>';
 }
 
 sub fl_default ($;$) {
@@ -326,7 +317,6 @@ sub fl_default ($;$) {
     if (! $edit) {
 	return $value;
     } else {
-# TODO render edit field here
 	return $value;
     }
 }
