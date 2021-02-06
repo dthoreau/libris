@@ -9,6 +9,7 @@ use Utils qw(true false);
 use Carp qw(confess);
 
 sub new {
+#TODO switch autocommit off
     my $db =
       DBI->connect( "dbi:Pg:dbname=libris", 'libris', '', { AutoCommit => 1 } );
 
@@ -19,11 +20,16 @@ sub new {
     return $self;
 }
 
+#TODO destroy function that rolls back cursor
+
+#TODO create transaction function (probably involving Try::Tiny
+
 sub insert_entry {
     my ( $self, $table, $values ) = @_;
 
     my $db = $self->{dbh};
 
+# TODO barf if not in transaction
     my @fnames = sort keys %$values;
     my @qlist;
     my @fields;
@@ -40,6 +46,8 @@ sub insert_entry {
 
     my $csr = $db->prepare($sql)     || fatal( $db->errstr );
     my $id  = $csr->execute(@fields) || fatal( $db->errstr );
+
+# TODO close the cursor
 
     return $db->last_insert_id(undef, undef, $table, undef);
 }
@@ -59,6 +67,8 @@ sub match_many ($$$$) {
     while ( my $row = $csr->fetchrow_hashref ) {
         push @$rows, $row;
     }
+
+#TODO close the cursor
     return $rows;
 }
 

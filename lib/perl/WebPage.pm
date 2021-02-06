@@ -213,12 +213,10 @@ sub make_table_from_rows ($$$$) {
                 $return .= render_cell( $field, $row, $fspecs->{$field} );
             }
             $return .= '</tr>';
-
         }
-
     }
     else {
-        $return .= '<tr><TD><em>No rows returned</td></tr>';
+        $return .= '<tr><TD><em>No rows returned</em></td></tr>';
     }
     $return .= '</table>';
 
@@ -276,6 +274,8 @@ sub register_table ($$$) {
 
     $self->add_page( "view-$table_name", "View $uc_tn",
         sub { $self->automatic_view_page($table_name) } );
+
+    my $meta = $self->db->fetch_table_meta($table_name);
 }
 
 sub automatic_list_page ($$) {

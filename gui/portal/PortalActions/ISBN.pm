@@ -33,7 +33,7 @@ sub add_table_books ($) {
     $page->register_table(
         'books',
         {
-            ListFields => [qw(title publication_date)],
+            ListFields => [qw(id publication_date)],
             ViewFields => [qw(title publication_date pages description)],
             EditFields => [qw(title publication_date pages description)],
             PostView   => \&books_post_view,
@@ -71,11 +71,11 @@ sub isbn_test {
         'https://www.googleapis.com/books/v1/volumes?q=isbn:%s' );
 
     foreach my $b (@$books) {
-        my $data = $fetcher->retrieve_json( 'isbn', [$b] );
-
-        my $stub = googleapi_to_internal($data);
-
-        my $book_id = add_book( $page, $stub );
+#        my $data = $fetcher->retrieve_json( 'isbn', [$b] );
+#
+#        my $stub = googleapi_to_internal($data);
+#
+#        my $book_id = add_book( $page, $stub );
     }
 
     $page->view_multiple_rows(
