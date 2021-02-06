@@ -85,7 +85,6 @@ sub isbn_test {
         'Author list' );
 }
 
-## Please see file perltidy.ERR
 sub add_book ($$) {
     my ( $page, $data ) = @_;
 

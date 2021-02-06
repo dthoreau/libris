@@ -9,6 +9,8 @@ use Util qw(true false);
 use DB;
 use Data::Dumper;
 
+use Storable qw(dclone);
+
 use Try::Tiny;
 
 $| = 1;
@@ -132,16 +134,36 @@ qq{<table><TR><TD class='section'>$title</td></tr>
 
 }
 
-sub view_multiple_rows ($$$$$) {
-    my ( $self, $fields, $clauses, $params, $title ) = @_;
+sub view_multiple_rows ($$$$$$) {
+    my ( $self, $fields, $clauses, $params, $title, $fspecs ) = @_;
 
-    $self->add_section(
-        $title,
-        sub {
-            make_table_from_query( $self, $fields, $clauses, $params );
-        },
-        true
-    );
+    my $db = $self->db;
+    my $rows = $db->match_many($fields, $clauses, $params);
+    $fspecs //= build_generic_fspecs($self, $fields);
+
+    $self->display_multiple_rows($rows, $fields, $title);
+}
+
+sub build_generic_fspecs ($$) {
+    my ($self, $fields) = @_;
+
+    my $fspec = {};
+    $fspec->{_field_list} = $fields;
+
+    foreach my $field (@$fields) {
+	$fspec->{$field} = {render => \&fl_default};
+    }
+    return $fspec;
+}
+
+
+sub display_multiple_rows {
+    my ($self, $data, $fields, $title, $specs) = @_;
+
+    $specs //= build_generic_fspecs($self, $fields);
+
+    $self->add_section( $title,
+        sub { $self->make_table_from_rows( $data, $specs ); }, true );
 }
 
 sub hash_to_table {
@@ -171,44 +193,44 @@ sub view_single_row {
             $fields->[0] = "$table.$fields->[0]";
             my $row = $db->match_single( $fields, 'id = %id', $id );
             return $self->hash_to_table( $row, $canned_fields );
-
         },
         true
     );
 
 }
 
-sub make_table_from_query ($$$$) {
-    my ( $self, $fields, $clauses, $params ) = @_;
+sub make_table_from_rows  ($$$$) {
+    my ($self, $rows, $fspecs) = @_;
 
-    my $db   = $self->db;
-    my $rows = $db->match_many( $fields, $clauses, $params );
+    $self->note(Dumper $fspecs);
+    my $field_list = $fspecs->{_field_list};
 
     my $return = '<table>';
     if ( scalar @$rows ) {
-
-        $return .= '<tr>';
-        foreach my $field (@$fields) {
+	$return .= '<tr>';
+        foreach my $field (@$field_list) {
             $field = _last_dot($field);
+
             my $dis = convert_label($field);
             $return .= "<th>$dis</th>";
-
         }
+	$return .='</tr>';
+	foreach my $row (@$rows) {
+	    $return .= '<tr>';
+	    foreach my $field (@$field_list) {
+		$return .= $self->render_cell($row->{$field}, $fspecs->{$field});
+	    }
+	    $return .= '</tr>'
 
-        $return .= "</tr>\n";
-        foreach my $row (@$rows) {
-            $return .= '<tr>';
-            foreach my $field (@$fields) {
-                $field = _last_dot($field);
-                $return .= "<td>$row->{$field}</td>";
-            }
-            $return .= '</tr>';
-        }
+
+	}
+
     }
     else {
         $return .= '<tr><TD><em>No rows returned</td></tr>';
     }
     $return .= '</table>';
+    $self->note(Dumper $rows);
 
     return $return;
 }
@@ -284,6 +306,28 @@ sub automatic_view_page {
     if ( exists $self->{Tables}{$table}{PostView} ) {
         my $func = $self->{Tables}{$table}{PostView};
         $func->( $self, $id );
+    }
+}
+
+sub render_cell($$$) {
+    my ($self, $value, $spec) = @_;
+
+    $self->note(Dumper $spec);
+    my $render = $spec->{render};
+    $render //= \&fl_default;
+    return '<td>' . $render->($value).'</td>';
+}
+
+sub fl_default ($;$) {
+    my ($value, $edit) = @_;
+
+    $edit //= false;
+
+    if (! $edit) {
+	return $value;
+    } else {
+# TODO render edit field here
+	return $value;
     }
 }
 
