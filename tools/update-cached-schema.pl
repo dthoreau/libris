@@ -6,6 +6,8 @@ use strict;
 $| = 1;
 
 use Data::Dumper;
+use XML::Simple;
+
 use lib q{/home/dominic/libris/lib/perl};
 
 use DB;
@@ -20,7 +22,6 @@ sub main {
 
     my $tables = _rows_to_columns(_fetch_sql($dbh, $sql), 'table_name');
 
-    print Dumper $tables;
     my $schema = {};
 
 # Get fields in tables
@@ -52,17 +53,32 @@ join information_schema.key_column_usage kcu
      and kcu.constraint_name = tco.constraint_name
      join information_schema.constraint_column_usage ccu on ccu.constraint_name
      = tco.constraint_name
-where tco.constraint_type in ('FOREIGN KEY',  'PRIMARY KEY')
+--where tco.constraint_type in ('FOREIGN KEY',  'PRIMARY KEY')
 order by kcu.table_schema,
          kcu.table_name,
          position";
 
-    print Dumper _fetch_sql($dbh, $sql); exit;
+    my $constraints = _fetch_sql($dbh, $sql);
 
+    foreach my $cons (@$constraints) {
+	my ($type, $table, $key_column) = get_hashvals($cons,
+		[qw(constraint_type table_name key_column)]);
+	if ($type eq 'PRIMARY KEY') {
+	    $schema->{$table}{$key_column}{primary_key} = 1;
+	} elsif ($type eq 'FOREIGN KEY') {
+	    my ($ftable, $fcolumn) = get_hashvals($cons, [qw(foreign_table_name foreign_column_name)]);
+	    $schema->{$table}{$key_column}{foreign_key} = {table=>$ftable,
+		column=>$fcolumn};
+	}
+	elsif ($type eq 'UNIQUE') {
+	    $schema->{$table}{$key_column}{unique} = 1;
+	}
+	else {print Dumper $cons;}
 
-# TODO get details on foreign keys
+    }
 
-    print Dumper $schema;
+# TODO look for not null
+    print XMLout($schema);
 }
 
 sub _fetch_sql($$) {
@@ -88,5 +104,30 @@ sub _rows_to_columns ($$) {
 
     return $return;
 }
+
+sub get_hashvals($$;$$) {
+    my ( $hash, $keys, $allow_undef, $undef_value ) = @_;
+
+    $undef_value //= undef;
+    my @result;
+    foreach my $key (@$keys) {
+        if ( !exists $hash->{$key} ) {
+            die "key  $key not present in hash " . Dumper $hash;
+        }
+        my $value = $hash->{$key};
+        if ( ( !defined $value ) && ( !$allow_undef ) ) {
+            die "Key $key is undefined in " . Dumper $hash;
+        }
+        $value //= $undef_value;
+        push @result, $value;
+    }
+    return @result;
+}
+
+
+
+
+
+
 
 main();

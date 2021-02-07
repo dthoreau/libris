@@ -1,0 +1,26 @@
+<opt>
+  <authors name="id" primary_key="1" type="integer" />
+  <authors name="name" type="text" unique="1" />
+  <authorship name="author" type="integer">
+    <foreign_key column="id" table="authors" />
+  </authorship>
+  <authorship name="book" type="integer">
+    <foreign_key column="id" table="books" />
+  </authorship>
+  <book_identifier name="book" type="integer">
+    <foreign_key column="id" table="books" />
+  </book_identifier>
+  <book_identifier name="id" primary_key="1" type="integer" />
+  <book_identifier name="identifier" type="text" />
+  <book_identifier name="identifier_type" type="integer">
+    <foreign_key column="id" table="identifier_types" />
+  </book_identifier>
+  <books name="description" type="text" />
+  <books name="id" primary_key="1" type="integer" />
+  <books name="pages" type="integer" />
+  <books name="publication_date" type="text" />
+  <books name="title" type="text" />
+  <identifier_types name="id" primary_key="1" type="integer" />
+  <identifier_types name="name" type="text" unique="1" />
+  <identifier_types name="tag" type="text" unique="1" />
+</opt>
