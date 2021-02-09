@@ -4,7 +4,7 @@ use warnings;
 use strict;
 
 use DBI;
-use Utils qw(true false);
+use Util qw(true false);
 
 use Carp qw(confess);
 
@@ -136,6 +136,13 @@ sub fatal ($) {
     $message .= "\n";
 
     confess $message;
+}
+
+sub fetch_table_meta($$) {
+    my ($self, $table_name) = @_;
+
+
+
 }
 
 1;
