@@ -26,12 +26,14 @@ sub main {
 
 # Get fields in tables
     foreach my $table (@$tables) {
-        $sql = "select column_name, data_type from information_schema.columns
+        $sql = "select column_name, data_type, is_nullable from information_schema.columns
 	    where table_schema = 'public' and table_name = '$table'";
         my $rows = _fetch_sql( $dbh, $sql );
         foreach my $row (@$rows) {
-            $schema->{$table}{ $row->{column_name} } =
-              { type => $row->{data_type} };
+            my ( $name, $type, $nullable ) =
+              get_hashvals( $row, [qw(column_name data_type is_nullable)] );
+            $schema->{table}{$table}{$name} =
+              { type => $type, nullable => $nullable };
         }
     }
 
@@ -64,21 +66,24 @@ order by kcu.table_schema,
 	my ($type, $table, $key_column) = get_hashvals($cons,
 		[qw(constraint_type table_name key_column)]);
 	if ($type eq 'PRIMARY KEY') {
-	    $schema->{$table}{$key_column}{primary_key} = 1;
+	    $schema->{table}{$table}{$key_column}{primary_key} = 1;
 	} elsif ($type eq 'FOREIGN KEY') {
 	    my ($ftable, $fcolumn) = get_hashvals($cons, [qw(foreign_table_name foreign_column_name)]);
-	    $schema->{$table}{$key_column}{foreign_key} = {table=>$ftable,
+	    $schema->{table}{$table}{$key_column}{foreign_key} = {table=>$ftable,
 		column=>$fcolumn};
 	}
 	elsif ($type eq 'UNIQUE') {
-	    $schema->{$table}{$key_column}{unique} = 1;
+	    $schema->{table}{$table}{$key_column}{unique} = 1;
 	}
 	else {print Dumper $cons;}
 
     }
 
+    print Dumper $schema;
 # TODO look for not null
     print XMLout($schema);
+
+    $db->insert_entry('local_schema', {tag=>'libris', schema=>XMLout($schema)});
 }
 
 sub _fetch_sql($$) {
