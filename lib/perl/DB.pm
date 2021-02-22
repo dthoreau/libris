@@ -7,6 +7,7 @@ use DBI;
 use Util qw(true false);
 
 use Carp qw(confess);
+use Data::Dumper;
 
 sub new {
 #TODO switch autocommit off
@@ -72,12 +73,25 @@ sub match_many ($$$$) {
     return $rows;
 }
 
+sub delete_entry {
+    my ( $self, $table, $id ) = @_;
+    my $db = $self->{dbh};
+
+    my $sql = "DELETE from $table WHERE id = ?";
+
+    my $csr = $db->prepare($sql) || fatal( $db->errstr );
+    $csr->execute(  $id  ) || fatal( $db->errstr );
+
+}
+
+
 sub match_optional_single ($$$$) {
     my ( $self, $fields, $clauses, $params, $opt ) = @_;
 
     return $self->match_single( $fields, $clauses, $params, true );
 }
 
+# TODO this one doesn't work properly
 sub match_tuple ($$$$) {
     my ( $self, $fields, $clauses, $params, $opt ) = @_;
 
@@ -85,7 +99,9 @@ sub match_tuple ($$$$) {
         fatal('Not called in array context');
     }
 
-    return @{ $self->match_single( $fields, $clauses, $params ) };
+    my $result = $self->match_single( $fields, $clauses, $params ) ;
+    my $return = $result->{id};
+    return ($return);
 }
 
 sub match_single ($$$$;$) {
