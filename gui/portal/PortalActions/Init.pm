@@ -41,6 +41,23 @@ sub home {
     my ($page) = @_;
 
     $page->add_section( 'Home', sub { return 'Build home page here' }, 0 );
+    $page->add_section( 'Actual content',
+        sub { return "<A HREF=?action=isbn-test>List Books</A>"; } );
+
+    my $here = q{<pre>Some notes:
+- there's one pre-defined action- isbn-test
+- there's a brief schema (books, authors, and authorship to connect the two
+	- both these primary table have view- and list- prefixed actions
+	hard-coded to show lists
+	- the list has no pager (yet)
+	- I've only input 6 books into the DB
+
+- One of my things to do is (after finishing the DB layer) is to import my ~700
+title library that's exported from LibraryThing in order that we have more test
+data. </pre>};
+
+$page->add_section('Notes', sub { return $here; });
+
 
 }
 

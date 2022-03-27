@@ -46,6 +46,10 @@ sub DESTROY {
           "<hr><em>Notes:</em><br><pre>$self->{notes}</pre>\n";
     }
 
+    my $action = $self->{'action'};
+    my $title  = $self->{actions}{$action}{title};
+
+    $template =~ s/<!-- TITLE -->/$title/e;
     $template =~ s/<!-- CONTENT -->/$self->{raw_content}/e;
 
     print $template;
