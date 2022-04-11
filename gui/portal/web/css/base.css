@@ -1,5 +1,11 @@
-th{ text-align: top;}
-td{ font-family: Arial, Helvetica, sans-serif;}
-td.section{ background: coral;}
+html.body { font-family: Arial, sans-serif;}
+th{ vertical-align: top; text-align: left;}
+td{ vertical-align: top;}
+
+td.section{ background: #D2B4DE;}
+
+tr:nth-child(odd) { background: #FFFF}
+tr:nth-child(even) { background: #EBDEF0}
+
 
 table {border: 1px dotted white;}
