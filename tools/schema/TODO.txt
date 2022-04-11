@@ -1,0 +1,21 @@
+List of things to add:
+
+Creators have roles when creating books
+
+Books fields:
+- publication
+- date
+- Language (with list, but probably all English)
+- summary
+- ddc (dewey decimal code)
+   - Wording
+   - tag list
+- genre (restricted list?)
+- page count
+- height
+- thickness
+- length
+- awards (from list)
+- asin, ean, upc
+- subject (from list)
+
