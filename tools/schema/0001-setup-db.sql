@@ -2,45 +2,56 @@ begin;
 
 \set ON_ERROR_STOP
 
-create sequence books_seq start 1;
+CREATE SEQUENCE books_seq start 1;
 
-create table books (
-	id integer primary key not null default nextval('books_seq'),
-	title text not null,
-	publication_date text not null,
-	pages int ,
-	description text);
+CREATE TABLE books (
+id               INTEGER PRIMARY KEY NOT NULL,
+ean              TEXT,
+upc              TEXT,
+asin             TEXT,
+pages            INT,
+title            TEXT NOT NULL,
+height           TEXT,
+length           TEXT,
+summary          TEXT,
+thickness        TEXT,
+page_count       INT,
+description      TEXT,
+publication      TEXT,
+publication_date TEXT NOT NULL);
 
-create sequence authors_seq start 1;
-create table authors (
-	id integer primary key not null default nextval('authors_seq'),
-	name text not null unique);
 
-create table authorship (
-	book integer not null references books,
-	author integer not null references authors
-	);
+CREATE SEQUENCE authors_seq start 1;
+
+CREATE table authors (
+id   INTEGER PRIMARY KEY NOT NULL,
+name TEXT NOT NULL UNIQUE);
 
 
-create sequence identifier_type_seq start 1;
+CREATE TABLE authorship (
+book   INTEGER NOT NULL,
+author INTEGER NOT NULL);
 
-create table identifier_types (
-	id integer primary key not null default nextval('identifier_type_seq'),
-	name text not null unique,
-	tag text not null unique
-	);
+
+
+CREATE SEQUENCE identifier_type_seq start 1;
+
+CREATE TABLE identifier_types (
+id   INTEGER PRIMARY KEY NOT NULL,
+tag  TEXT NOT NULL,
+name TEXT NOT NULL);
 
 insert into identifier_types (name, tag) values ('ISBN-10', 'ISBN_10'),
        ('ISBN 13', 'ISBN_13');
 
-create sequence identifier_seq start 1;
-create table book_identifier (
-	id integer primary key not null default nextval('identifier_seq'),
-	book integer references books not null,
-	identifier_type integer references identifier_types  not null,
-	identifier text not null);
+CREATE SEQUENCE identifier_seq start 1;
+
+CREATE TABLE identifier (
+id              INTEGER PRIMARY KEY NOT NULL,
+book            INTEGER NOT NULL,
+identifier      TEXT NOT NULL,
+identifier_type INTEGER NOT NULL);
 
 
 
-
-commit;
+COMMIT;
