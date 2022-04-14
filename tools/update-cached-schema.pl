@@ -17,10 +17,12 @@ sub main {
 
     my $dbh = $db->{dbh};
 
-    my $sch = $db->match_single( ['local_schema.id'], ['tag = %tag'],
+    my $sch = $db->match_optional_single( ['local_schema.id'], ['tag = %tag'],
         { tag => 'libris' } );
 
+    if ($sch && -e $sch->{id}) {
     $db->delete_entry('local_schema', $sch->{id});
+    }
 
     # Get table list
     my $sql =
