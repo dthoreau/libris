@@ -16,7 +16,7 @@ sub get_subjects_hash ($) {
     my $db_subjects = $db->match_many( [ 'subjects.id', 'name' ], [], {} );
 
     foreach my $db_s (@$db_subjects) {
-        my ( $id, $name ) = get_hashval( $db_s, [qw(id name)] );
+        my ( $id, $name ) = get_hashvals( $db_s, [qw(id name)] );
         $return_hash->{$name} = $id;
     }
     return $return_hash;
@@ -33,6 +33,7 @@ sub maybe_add_subject ($$;$) {
 	$lookup->{$subject} = $id;
     }
     return $lookup;
+}
 
 
 1;

@@ -18,7 +18,7 @@ thickness        TEXT,
 page_count       INT,
 description      TEXT,
 publication      TEXT,
-publication_date TEXT NOT NULL);
+publication_date TEXT);
 
 create sequence author_role_seq start 1;
 
@@ -33,8 +33,8 @@ id   INTEGER PRIMARY KEY NOT NULL default nextval('authors_seq'),
 name TEXT NOT NULL UNIQUE);
 
 CREATE TABLE authorship (
-book   INTEGER NOT NULL,
-author INTEGER NOT NULL);
+book   INTEGER NOT NULL references books,
+author INTEGER NOT NULL references authors);
 
 
 CREATE SEQUENCE identifier_type_seq start 1;
@@ -57,6 +57,14 @@ identifier_type INTEGER NOT NULL);
 
 create sequence subject_seq start 1;
 
-create table subjects (id int primary key not null, name text not null);
+CREATE TABLE subjects (
+id   INT PRIMARY KEY NOT NULL default nextval('subject_seq'),
+name TEXT NOT NULL);
+
+CREATE TABLE book_subjects (
+book    INT NOT NULL references books,
+subject INT NOT NULL references subjects);
+
+
 
 COMMIT;
