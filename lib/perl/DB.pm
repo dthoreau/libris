@@ -21,9 +21,8 @@ sub new {
 
     my ($schema) = $self->match_tuple(['local_schema.schema'], ['tag = %libris'],{libris=>'libris'});
 
-    $self->{schema} = decode_json($schema);
-
-
+    my $decoded = decode_json($schema);
+    $self->{schema} = ${decode_json($schema)}{table};
 
     return $self;
 }
@@ -56,12 +55,12 @@ sub insert_entry {
     my $id  = $csr->execute(@fields) || fatal( $db->errstr );
 
 # TODO close the cursor
-    if ( exists $db->{schema}{$table}{fields}{id} ) {
+    if ( exists $self->{schema}{table}{$table}{fields}{id} ) {
         return $db->last_insert_id( undef, undef, $table, undef );
     }
     else {
         return;
-    }
+   }
 }
 
 sub match_many ($$$$) {

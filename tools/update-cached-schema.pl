@@ -6,23 +6,23 @@ use strict;
 $| = 1;
 
 use Data::Dumper;
-use XML::Simple;
+use JSON;
 
 use lib q{../lib/perl};
 
 use DB;
-use Util qw{get_hashvals get hashval};
+use Util qw{get_hashvals get_hashval};
 
 sub main {
     my $db = DB->new();
 
     my $dbh = $db->{dbh};
 
-    my $sch = $db->match_optional_single( ['local_schema.id'], ['tag = %tag'],
+    my ($sch) = $db->match_optional_single( ['local_schema.id'], ['tag = %tag'],
         { tag => 'libris' } );
 
-    if ($sch && -e $sch->{id}) {
-    $db->delete_entry('local_schema', $sch->{id});
+    if ($sch) {
+        $db->delete_entry( 'local_schema', $sch->{id});
     }
 
     # Get table list
@@ -93,7 +93,8 @@ order by kcu.table_schema,
 
     }
 
-    $db->insert_entry('local_schema', {tag=>'libris', schema=>XMLout($schema)});
+    $db->insert_entry( 'local_schema',
+        { tag => 'libris', schema => encode_json($schema) } );
 }
 
 sub _fetch_sql($$) {
