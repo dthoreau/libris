@@ -310,11 +310,21 @@ sub render_cell($$$) {
     my $class = $spec->{class};
     my $r_class = ($class) ? " class=$class": '';
     $render //= \&fl_default;
-    return "<td$r_class>" . $render->($row->{$field}).'</td>';
+    return "<td$r_class>" . $render->($row, $field, false).'</td>';
+}
+
+sub fl_link_field($$;$) {
+    my ($row, $field, $edit) = @_;
+
+    my $value = $row->{$field};
+    return $value;
+
 }
 
 sub fl_default ($;$) {
-    my ($value, $edit) = @_;
+    my ($row, $field, $edit) = @_;
+
+    my $value = $row->{$field};
 
     $edit //= false;
 

@@ -2,3 +2,4 @@ psql libris -U libris -f undo-0002.schema.sql
 psql libris -U libris -f undo-0001-setup-db.sql
 psql libris -U libris -f 0001-setup-db.sql
 psql libris -U libris -f 0002-schema.sql
+../update-cached-schema.pl

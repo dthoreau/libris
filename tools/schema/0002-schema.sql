@@ -9,4 +9,6 @@ CREATE TABLE local_schema (
 	tag text not null,
 	schema text not null);
 
+insert into local_schema (tag, schema) values ('libris', '{}');
+
 commit;

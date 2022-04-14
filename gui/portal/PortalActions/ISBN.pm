@@ -30,9 +30,7 @@ sub init_isbn {
 sub add_table_books ($) {
     my ($page) = @_;
 
-    $page->register_table(
-        'books',
-        {
+    $page->register_table( 'books', {
             ListFields => [qw(id publication_date)],
             ViewFields => [qw(title publication_date pages description)],
             EditFields => [qw(title publication_date pages description)],
@@ -44,6 +42,8 @@ sub add_table_books ($) {
 sub books_post_view {
     my ( $page, $id ) = @_;
 
+    $page->view_multiple_rows(['authorship.author'],['book = %id'], $id,
+	    'Authors');
     $page->add_section( 'Note', sub { return 'Generate author list here'; },
         0 );
 }
@@ -67,22 +67,24 @@ sub isbn_test {
           )
     ];
 
-    $fetcher->store_url( 'isbn',
-        'https://www.googleapis.com/books/v1/volumes?q=isbn:%s' );
-
-    foreach my $b (@$books) {
-#        my $data = $fetcher->retrieve_json( 'isbn', [$b] );
+#   $fetcher->store_url( 'isbn',
+#       'https://www.googleapis.com/books/v1/volumes?q=isbn:%s' );
 #
-#        my $stub = googleapi_to_internal($data);
+#   foreach my $b (@$books) {
+#       my $data = $fetcher->retrieve_json( 'isbn', [$b] );
 #
-#        my $book_id = add_book( $page, $stub );
-    }
+#       my $stub = googleapi_to_internal($data);
+#
+#       my $book_id = add_book( $page, $stub );
+#   }
 
     $page->view_multiple_rows(
         [ 'books.id', 'title', 'pages', 'publication_date', 'description' ],
         [], {}, 'Book List' );
     $page->view_multiple_rows( [ 'authors.id', 'name' ], [], {},
         'Author list' );
+
+    $page->note(Dumper $db);
 }
 
 sub add_book ($$) {

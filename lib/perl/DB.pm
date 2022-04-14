@@ -55,7 +55,7 @@ sub insert_entry {
     my $id  = $csr->execute(@fields) || fatal( $db->errstr );
 
 # TODO close the cursor
-    if ( exists $self->{schema}{table}{$table}{fields}{id} ) {
+    if ( exists $self->{schema}{$table}{fields}{id} ) {
         return $db->last_insert_id( undef, undef, $table, undef );
     }
     else {
@@ -150,7 +150,7 @@ sub _build_select_query {
     my $cc = 0;
     foreach my $clause (@$clauses) {
         $cc++;
-        if ( $clause =~ /^(.*)\s\%(\w*)\s?$/ ) {
+        if ( $clause =~ /^(.*)\s\%(\w*)/g ) {
             $clause = "$1 ?";
             push @$param_array, $params->{$2};
         }

@@ -29,9 +29,10 @@ sub main {
     my ( $books, $authors, $subjects ) = pre_process( $data, $db );
 
     foreach my $book (@$books) {
-        my ( $title, $authors) =
+        my ( $title, $book_authors) =
           get_hashvals( $book, [qw(title authors)] ) ;
 
+	print Dumper "adding book '$title'";
 	my $book_subjects = $book->{subject};
         my $book_id = $db->match_optional_single(
 	    ['books.id'],
@@ -47,6 +48,19 @@ sub main {
 	    my $s_id = $subjects->{$subject};
 	    $db->insert_entry('book_subjects',{book=>$book_id, subject=>$s_id});
 	}
+	print Dumper "added subjects";
+
+	print Dumper ref $book_authors;
+	foreach my $author (@$book_authors) {
+
+	    if (ref $author eq 'ARRAY') { next;}
+	    my $a_id = $authors->{$author->{fl}};
+
+	    if (defined $a_id) {
+	    $db->insert_entry('authorship', {book=>$book_id, author=>$a_id});
+	    }
+	}
+	 print Dumper "added authors";
 
     }
 
