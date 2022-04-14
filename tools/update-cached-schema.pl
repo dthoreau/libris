@@ -8,9 +8,10 @@ $| = 1;
 use Data::Dumper;
 use XML::Simple;
 
-use lib q{/home/dominic/libris/lib/perl};
+use lib q{../lib/perl};
 
 use DB;
+use Util qw{get_hashvals get hashval};
 
 sub main {
     my $db = DB->new();
@@ -118,25 +119,6 @@ sub _rows_to_columns ($$) {
     foreach my $row (@$rows) { push @$return, $row->{$key}; }
 
     return $return;
-}
-
-sub get_hashvals($$;$$) {
-    my ( $hash, $keys, $allow_undef, $undef_value ) = @_;
-
-    $undef_value //= undef;
-    my @result;
-    foreach my $key (@$keys) {
-        if ( !exists $hash->{$key} ) {
-            die "key  $key not present in hash " . Dumper $hash;
-        }
-        my $value = $hash->{$key};
-        if ( ( !defined $value ) && ( !$allow_undef ) ) {
-            die "Key $key is undefined in " . Dumper $hash;
-        }
-        $value //= $undef_value;
-        push @result, $value;
-    }
-    return @result;
 }
 
 main();

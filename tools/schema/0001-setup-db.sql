@@ -55,6 +55,8 @@ book            INTEGER NOT NULL,
 identifier      TEXT NOT NULL,
 identifier_type INTEGER NOT NULL);
 
+create sequence subject_seq start 1;
 
+create table subjects (id int primary key not null, name text not null);
 
 COMMIT;
