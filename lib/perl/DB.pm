@@ -4,19 +4,26 @@ use warnings;
 use strict;
 
 use DBI;
-use Util qw(true false);
+use Util qw(true false get_hashvals);
 
 use Carp qw(confess);
 use Data::Dumper;
+
+use JSON;
+use List::Util;
 
 sub new {
 #TODO switch autocommit off
     my $db =
       DBI->connect( "dbi:Pg:dbname=libris", 'libris', '', { AutoCommit => 1 } );
 
-    my $self = { dbh => $db };
+    my $self = bless { dbh => $db };
 
-    bless $self;
+    my ($schema) = $self->match_tuple(['local_schema.schema'], ['tag = %libris'],{libris=>'libris'});
+
+    $self->{schema} = decode_json($schema);
+
+
 
     return $self;
 }
@@ -49,8 +56,12 @@ sub insert_entry {
     my $id  = $csr->execute(@fields) || fatal( $db->errstr );
 
 # TODO close the cursor
-
-    return $db->last_insert_id(undef, undef, $table, undef);
+    if ( exists $db->{schema}{$table}{fields}{id} ) {
+        return $db->last_insert_id( undef, undef, $table, undef );
+    }
+    else {
+        return;
+    }
 }
 
 sub match_many ($$$$) {
@@ -86,12 +97,17 @@ sub delete_entry {
 
 
 sub match_optional_single ($$$$) {
-    my ( $self, $fields, $clauses, $params, $opt ) = @_;
+    my ( $self, $fields, $clauses, $params ) = @_;
 
-    return $self->match_single( $fields, $clauses, $params, true );
+    my $rows = $self->match_many( $fields, $clauses, $params );
+
+    if (scalar @$rows > 1) {
+	confess(scalar @$rows . ' returned, should be maximum of one');
+    }
+
+    return $rows->[0];
 }
 
-# TODO this one doesn't work properly
 sub match_tuple ($$$$) {
     my ( $self, $fields, $clauses, $params, $opt ) = @_;
 
@@ -100,20 +116,20 @@ sub match_tuple ($$$$) {
     }
 
     my $result = $self->match_single( $fields, $clauses, $params ) ;
-    my $return = $result->{id};
-    return ($return);
+    my $names = _tuple_names($fields);
+
+    my @return = get_hashvals($result,_tuple_names($fields),true);
+    return @return;
 }
 
-sub match_single ($$$$;$) {
-    my ( $self, $fields, $clauses, $params, $opt ) = @_;
-
-    $opt //= false;
+sub match_single ($$$$) {
+    my ( $self, $fields, $clauses, $params) = @_;
 
     my $rows = $self->match_many( $fields, $clauses, $params );
 
     my $row_count = scalar @$rows;
     if ( $row_count == 0 ) {
-        confess("1 row expected, zero returned") unless $opt;
+        confess("1 row expected, zero returned");
     }
     elsif ( $row_count > 1 ) {
         confess("1 row expected, $row_count returned");
@@ -153,6 +169,22 @@ sub fatal ($) {
 
     confess $message;
 }
+
+sub _tuple_names {
+    my ($a) = @_;
+
+    my $r = [];
+    foreach my $b (@$a) {
+        if ( $b =~ /^(\:):(.*)$/ ) { push @$r, $1; }
+        else {
+            my @blist = split /\./, $b;
+            my $blen  = scalar @blist;
+            push @$r, $blist[ $blen - 1 ];
+        }
+    }
+    return $r;
+}
+
 
 sub fetch_table_meta($$) {
     my ($self, $table_name) = @_;
