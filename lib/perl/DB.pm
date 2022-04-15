@@ -4,10 +4,12 @@ use warnings;
 use strict;
 
 use DBI;
-use Util qw(true false get_hashvals);
+use Util qw(true false get_hashvals get_hashval);
 
 use Carp qw(confess);
+
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
 
 use JSON;
 use List::Util;
@@ -19,10 +21,13 @@ sub new {
 
     my $self = bless { dbh => $db };
 
-    my ($schema) = $self->match_tuple(['local_schema.schema'], ['tag = %libris'],{libris=>'libris'});
+    my $csr = $db->prepare('SELECT schema FROM local_schema WHERE tag = ?');
+    $csr->execute(('libris'));
+    my $schema = $csr->fetchrow_hashref;
 
-    my $decoded = decode_json($schema);
-    $self->{schema} = ${decode_json($schema)}{table};
+    my $decoded = decode_json($schema->{schema});
+
+    $self->{schema} = $decoded->{table};
 
     return $self;
 }
@@ -69,7 +74,7 @@ sub match_many ($$$$) {
     my $db = $self->{dbh};
 
     my ( $sql, $param_array ) =
-      _build_select_query( $fields, $clauses, $params );
+      _build_select_query($self, $fields, $clauses, $params );
 
     my $csr = $db->prepare($sql) || fatal( $db->errstr );
     $csr->execute(@$param_array) || fatal( $db->errstr );
@@ -87,13 +92,12 @@ sub delete_entry {
     my ( $self, $table, $id ) = @_;
     my $db = $self->{dbh};
 
-    my $sql = "DELETE from $table WHERE id = ?";
+    my $sql = "DELETE ffom $table WHERE id = ?";
 
     my $csr = $db->prepare($sql) || fatal( $db->errstr );
     $csr->execute(  $id  ) || fatal( $db->errstr );
 
 }
-
 
 sub match_optional_single ($$$$) {
     my ( $self, $fields, $clauses, $params ) = @_;
@@ -137,17 +141,18 @@ sub match_single ($$$$) {
 }
 
 sub _build_select_query {
-    my ( $fields, $clauses, $params ) = @_;
+    my ( $self, $fields, $clauses, $params ) = @_;
 
+    my $schema = $self->{schema};
     $clauses = ( ref $clauses eq 'ARRAY' ) ? $clauses : [$clauses];
     $params  = ( ref $params eq 'HASH' )   ? $params  : { id => $params };
 
-    my ($table) = split /\./, $fields->[0];
+    my ( @s_fields, @s_tables, @s_clauses, @s_joins );
 
-    my $param_array = [];
-    my $sql         = 'SELECT ' . join( ', ', @$fields ) . " FROM $table ";
+    $fields->[0] =~ /^(\:*):?(\w*).(\w*)$/;
+    my ( $alias, $base_table, $field ) = ( $1, $2, $3 );
 
-    my $cc = 0;
+    my ( $cc, $param_array );
     foreach my $clause (@$clauses) {
         $cc++;
         if ( $clause =~ /^(.*)\s\%(\w*)/g ) {
@@ -156,7 +161,42 @@ sub _build_select_query {
         }
     }
 
-    if ($cc) { $sql = "$sql WHERE " . join ' AND ', @$clauses; }
+    push @s_fields, $field;
+    push @s_tables, $base_table;
+    @s_clauses = @$clauses;
+
+    my $first;
+
+    foreach my $it_field (@$fields) {
+        if ( $it_field eq $fields->[0] ) { next; }
+        if ( $it_field !~ /\./ ) { push @s_fields, $it_field; next; }
+        my ( $a, $b ) = split /\./, $it_field;
+        if ( exists $schema->{$a} ) {
+
+            # is table
+        }
+        elsif ( $schema->{$base_table}{fields}{$a} ) {
+            my $fk =
+              get_hashval( $schema->{$base_table}{fields}{$a}, 'foreign_key' );
+            my $new_table = get_hashval( $fk, 'table' );
+            my $fk_pk     = get_hashval( $fk, 'column' );
+            push @s_fields, "$new_table.$b";
+            push @s_joins,
+              "left join $new_table on $new_table.$fk_pk = $base_table.$a";
+
+        }
+    }
+
+    my $sql =
+        'SELECT '
+      . ( join ', ', @s_fields )
+      . ' FROM '
+      . ( join ', ', @s_tables );
+
+    if ( scalar @s_joins ) { $sql .= ' ' . join ' ', @s_joins; }
+    if ( scalar @s_clauses ) {
+        $sql .= " WHERE " . ( join ' AND ', @s_clauses );
+    }
 
     return ( $sql, $param_array );
 }
@@ -183,7 +223,6 @@ sub _tuple_names {
     }
     return $r;
 }
-
 
 sub fetch_table_meta($$) {
     my ($self, $table_name) = @_;

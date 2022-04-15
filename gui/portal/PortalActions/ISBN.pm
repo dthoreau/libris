@@ -23,7 +23,12 @@ sub init_isbn {
     my ($page) = @_;
 
     add_table_books($page);
+    add_table_subjects($page);
+    add_table_authors($page);
 
+    foreach my $pivot (qw(authorship book_subjects)) {
+	$page->register_pivot($pivot);
+    }
     $page->add_page( $A_isbn_test, 'ISBN Test', \&isbn_test );
 }
 
@@ -34,7 +39,29 @@ sub add_table_books ($) {
             ListFields => [qw(id publication_date)],
             ViewFields => [qw(title publication_date pages description)],
             EditFields => [qw(title publication_date pages description)],
+	    NameField  => 'title',
             PostView   => \&books_post_view,
+        }
+    ); }
+
+sub add_table_subjects {
+    my ($page) = @_;
+
+    $page->register_table( 'subjects', {
+            ListFields => [qw(id name)],
+            ViewFields => ['name'],
+            NameField  => 'name'
+        }
+    );
+}
+
+sub add_table_authors {
+    my ($page) = @_;
+
+    $page->register_table( 'authors', {
+            ListFields => [qw(id name)],
+            ViewFields => ['name'],
+            NameField  => 'name'
         }
     );
 }
@@ -42,10 +69,11 @@ sub add_table_books ($) {
 sub books_post_view {
     my ( $page, $id ) = @_;
 
-    $page->view_multiple_rows(['authorship.author'],['book = %id'], $id,
-	    'Authors');
-    $page->add_section( 'Note', sub { return 'Generate author list here'; },
-        0 );
+    $page->view_multiple_rows( [ 'authorship.author', 'author.name' ],
+        ['book = %id'], $id, 'Authors' );
+
+    $page->view_multiple_rows( [ 'book_subjects.subject', 'subject.name' ],
+        ['book = %id'], $id, 'Subjects' );
 }
 
 sub isbn_test {

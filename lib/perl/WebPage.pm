@@ -184,8 +184,8 @@ sub view_single_row {
     $self->add_section(
         'Single Row',
         sub {
-            my $fields        = $self->{Tables}{$table}{ViewFields};
-            my $canned_fields = $self->{Tables}{$table}{ViewFields};
+            my $fields        = $self->{tableDesc}{$table}{ViewFields};
+            my $canned_fields = $self->{tableDesc}{$table}{ViewFields};
 
             $fields->[0] = "$table.$fields->[0]";
             my $row = $db->match_single( $fields, 'id = %id', $id );
@@ -271,7 +271,7 @@ sub register_table ($$$) {
     my ( $self, $table_name, $details ) = @_;
 
     my $uc_tn = ucfirst $table_name;
-    $self->{Tables}{$table_name} = $details;
+    $self->{tableDesc}{$table_name} = $details;
 
     $self->add_page( "list-$table_name", "List $uc_tn",
         sub { $self->automatic_list_page($table_name); } );
@@ -282,10 +282,22 @@ sub register_table ($$$) {
     my $meta = $self->db->fetch_table_meta($table_name);
 }
 
+sub register_pivot ($$$) {
+    my ($self, $table_name) = @_;
+    my $db = $self->db;
+
+    my $details = { ListFields => [keys %{$db->{schema}{$table_name}{fields}}],
+	EditFields => []};
+
+    $self->register_table($table_name, $details);
+
+
+}
+
 sub automatic_list_page ($$) {
     my ( $self, $table ) = @_;
 
-    my $fields = $self->{Tables}{$table}{ListFields};
+    my $fields = $self->{tableDesc}{$table}{ListFields};
     $fields->[0] = "$table.$fields->[0]";
 
     $self->view_multiple_rows( $fields, [], {}, ucfirst $table );
@@ -297,8 +309,8 @@ sub automatic_view_page {
     my $id = $self->{cgi}->param('id');
 
     $self->view_single_row( $table, $id );
-    if ( exists $self->{Tables}{$table}{PostView} ) {
-        my $func = $self->{Tables}{$table}{PostView};
+    if ( exists $self->{tableDesc}{$table}{PostView} ) {
+        my $func = $self->{tableDesc}{$table}{PostView};
         $func->( $self, $id );
     }
 }
