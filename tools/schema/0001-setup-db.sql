@@ -58,12 +58,12 @@ identifier_type INTEGER NOT NULL);
 create sequence subject_seq start 1;
 
 CREATE TABLE subjects (
-id   INT PRIMARY KEY NOT NULL default nextval('subject_seq'),
+id   INTEGER PRIMARY KEY NOT NULL default nextval('subject_seq'),
 name TEXT NOT NULL);
 
 CREATE TABLE book_subjects (
-book    INT NOT NULL references books,
-subject INT NOT NULL references subjects);
+book    INTEGER NOT NULL references books,
+subject INTEGER NOT NULL references subjects);
 
 
 
