@@ -12,6 +12,11 @@ use Util qw{get_hashval get_hashvals};
 use Authors qw{maybe_add_author get_authors_hash};
 use Subjects qw(maybe_add_subject get_subjects_hash);
 
+use Genres qw(maybe_add_genre get_genres_hash);
+use Series qw(maybe_add_series get_series_hash);
+use Awards qw(maybe_add_award get_awards_hash);
+use Keywords qw(maybe_add_keyword get_keywords_hash);
+
 use List::Util qw(uniq);
 use Data::Dumper;
 
@@ -20,50 +25,65 @@ sub main {
 
     my $filename = shift @ARGV;
 
+    my $counts = {} ;
+
     if ( !-e $filename ) { die "$filename not found"; }
 
     my $text = slurp($filename);
 
     my $data = decode_json($text);
 
-    my ( $books, $authors, $subjects ) = pre_process( $data, $db );
+    my ( $books, $authors, $subjects, $awards ) =
+      pre_process( $data, $db );
 
     foreach my $book (@$books) {
-        my ( $title, $book_authors) =
-          get_hashvals( $book, [qw(title authors)] ) ;
+        my ( $title, $book_authors ) =
+          get_hashvals( $book, [qw(title authors)] );
 
-	print Dumper "adding book '$title'";
-	my $book_subjects = $book->{subject};
-        my $book_id = $db->match_optional_single(
-	    ['books.id'],
-	    ['title = %title'],
-	    { title => $title } );
+        my $book_subjects = $book->{subject};
+        my $book_id =
+          $db->match_optional_single( ['books.id'], ['title = %title'],
+            { title => $title } );
 
-	if (defined $book_id) { next;}
+        if ( defined $book_id ) { next; }
 
-	$book_id = $db->insert_entry('books', {title=>$title, });
+        $book_id = $db->insert_entry( 'books', { title => $title, } );
+        $counts->{books}++;
 
-	my $s_list = collapse_ends($book_subjects) ;
-	foreach my $subject (@$s_list) {
-	    my $s_id = $subjects->{$subject};
-	    $db->insert_entry('book_subjects',{book=>$book_id, subject=>$s_id});
-	}
-	print Dumper "added subjects";
+        my $s_list = collapse_ends($book_subjects);
+        foreach my $subject (@$s_list) {
+            my $s_id = $subjects->{$subject};
+            $db->insert_entry( 'book_subjects',
+                { book => $book_id, subject => $s_id } );
+            $counts->{subjects}++;
+        }
 
-	print Dumper ref $book_authors;
-	foreach my $author (@$book_authors) {
+        foreach my $author (@$book_authors) {
+            if ( ref $author eq 'ARRAY' ) { next; }
+            my $a_id = $authors->{ $author->{fl} };
 
-	    if (ref $author eq 'ARRAY') { next;}
-	    my $a_id = $authors->{$author->{fl}};
+            if ( defined $a_id ) {
+                $db->insert_entry( 'authorship',
+                    { book => $book_id, author => $a_id } );
+                $counts->{authors}++;
+            }
+        }
 
-	    if (defined $a_id) {
-	    $db->insert_entry('authorship', {book=>$book_id, author=>$a_id});
+	if (exists $book->{awards}) {
+	    my $book_awards = $book->{awards};
+	    foreach my $award (@$book_awards) {
+		my $a_id = $awards->{$award};
+		if (defined $a_id) {
+		    $db->insert_entry('book_awards',
+			    {book=>$book_id,award=>$a_id});
+		    $counts->{awards}++;
+		}
 	    }
 	}
-	 print Dumper "added authors";
 
     }
 
+    print Dumper $counts;
 }
 
 sub pre_process {
@@ -71,6 +91,7 @@ sub pre_process {
 
     my $db_authors = get_authors_hash($db);
     my $db_subjects = get_subjects_hash($db);
+    my $db_awards = get_awards_hash($db);
     my $books;
     foreach my $key ( keys %$data ) {
         my $book   = get_hashval( $data, $key );
@@ -80,7 +101,6 @@ sub pre_process {
             if ( ref $writer ne 'HASH' ) { next; }
             my $name = get_hashval( $writer, 'fl' );
             $db_authors = maybe_add_author( $db, $name, $db_authors );
-
         }
         if ( exists $book->{subject} ) {
             my $subjects = collapse_ends( $book->{subject} );
@@ -88,9 +108,15 @@ sub pre_process {
 		$db_subjects=maybe_add_subject($db, $subject, $db_subjects);
 	    }
         }
+	if (exists $book->{awards}) {
+	    my $awards = $book->{awards};
+	    foreach my $award (@$awards) {
+		$db_awards = maybe_add_award($db, $award, $db_awards);
+	    }
+	}
     }
 
-    return ($books, $db_authors, $db_subjects);
+    return ($books, $db_authors, $db_subjects, $db_awards);
 }
 
 sub slurp($) {

@@ -44,7 +44,8 @@ create table awards (
 
 create table book_awards (
 	book INTEGER not null references books,
-	subject INTEGER not null references awards);
+	award INTEGER not null references awards
+	);
 
 
 commit;
