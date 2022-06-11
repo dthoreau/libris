@@ -92,7 +92,7 @@ sub delete_entry {
     my ( $self, $table, $id ) = @_;
     my $db = $self->{dbh};
 
-    my $sql = "DELETE ffom $table WHERE id = ?";
+    my $sql = "DELETE from $table WHERE id = ?";
 
     my $csr = $db->prepare($sql) || fatal( $db->errstr );
     $csr->execute(  $id  ) || fatal( $db->errstr );
