@@ -1,11 +1,11 @@
-package Seriers;
+package Series;
 
 use warnings;
 use strict;
 
 require Exporter;
 our @ISA = q{Exporter};
-our @EXPORT_OK = qw{get_series_hash maybe_add_series};
+our @EXPORT_OK = qw{wibble get_series_hash maybe_add_series};
 
 use Util qw{get_hashval get_hashvals};
 

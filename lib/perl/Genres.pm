@@ -23,7 +23,7 @@ sub get_genres_hash {
     return $return_hash;
 }
 
-sub maybe_add_author($$;$) {
+sub maybe_add_genre($$;$) {
     my ( $db, $name, $lookup ) = @_;
 
     $lookup //= get_genres_hash($db);
