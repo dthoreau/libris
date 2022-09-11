@@ -1,0 +1,217 @@
+openapi: 3.0.3
+info:
+ title: Biblio Librarian - Open API 3.0
+ version: 0.0.1
+
+paths:
+  /book:
+    put:
+      tags:
+      - book
+      summary: Update an existing book
+      responses:
+        '403':
+          description: Validation Exception
+    post:
+      tags:
+      - book
+      summary: Add a new book to the library
+      requestBody:
+        description: Add a new book to the library
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Book'
+      responses:
+        '403':
+          description: Validation Exception
+  /book/{isbn}:
+    get:
+      tags:
+      - book
+      summary: Retrieve an existing book
+      parameters:
+        - name: isbn
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/ISBN'
+      responses:
+        '200':
+          description: Successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Book'
+  /books:
+    get:
+      tags:
+      - book
+      summary: Retrieve multiple books
+      parameters:
+        - name: books
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ISBN'
+      responses:
+        '200':
+          description: requested list of books
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Book'
+  /author:
+    get:
+      tags:
+      - author
+      summary: Fetch ISBN list of authors works
+      parameters:
+        - name: author
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Author'
+      responses:
+        '200':
+          description: list of books by this author
+          content:
+            application/'json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ISBN'
+  /award:
+    get:
+      tags:
+      - award
+      summary: list of books that have won this award
+      parameters:
+        - name: award
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Award'
+      responses:
+        '200':
+          description: list of books that won award
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ISBN'
+  /series:
+    get:
+      tags:
+      - series
+      summary: List of books in this series
+      parameters:
+        - name: series
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Series'
+      responses:
+        '200':
+          description: list of books in series
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ISBN'
+  /subjects:
+    get:
+      tags:
+      - series
+      summary: list of books in subject
+      parameters:
+        - name: subject
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/Subject'
+      responses:
+        '200':
+          description: List of books in subject
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ISBN'
+  /stats:
+    get:
+      tags:
+      - informational
+      summary: provide statistics on known books
+      responses:
+        '200':
+          description: list of statistics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Factoid'
+components:
+  schemas:
+    ISBN:
+      type: object
+      properties:
+        value:
+          format: string
+          example: 978-0-224-10039-7
+    Author:
+      required:
+        - name
+      type: string
+    Award:
+      type: string
+    Subject:
+      type: string
+    Genre:
+      type: string
+    Series:
+      type: string
+    Factoid:
+      type: string
+    Book:
+      required:
+        - title
+        - authors
+        - isbn
+      type: object
+      properties:
+        title:
+          format: string
+          example: Open Net - A professional amateur in the world of big-time Hockey
+        authors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Author'
+        isbn:
+	  type: array
+	  items:
+            $ref: '#/components/schemas/ISBN'
+        awards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Award'
+        subjects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subject'
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+
+
+
+
