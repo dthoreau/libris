@@ -196,8 +196,8 @@ components:
           items:
             $ref: '#/components/schemas/Author'
         isbn:
-	  type: array
-	  items:
+          type: array
+          items:
             $ref: '#/components/schemas/ISBN'
         awards:
           type: array
@@ -211,7 +211,3 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Genre'
-
-
-
-
