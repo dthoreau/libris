@@ -181,11 +181,15 @@ components:
       type: string
     Factoid:
       type: string
+    Dewey:
+      type: string
     Book:
       required:
         - title
         - authors
         - isbn
+        - pages
+        - publicationDate
       type: object
       properties:
         title:
@@ -196,8 +200,8 @@ components:
           items:
             $ref: '#/components/schemas/Author'
         isbn:
-	  type: array
-	  items:
+          type: array
+          items:
             $ref: '#/components/schemas/ISBN'
         awards:
           type: array
@@ -211,7 +215,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Genre'
-
-
-
+        ean:
+          format: string
+        upc:
+          format: string
+        asin:
+          format: string
+        height:
+          format: string
+        width:
+          format: string
+        thickness:
+          format: string
+        summary:
+          format: string
+        pages:
+          format: integer
+        description:
+          format: string
+        publicationDate:
+          format: string
+        dewey:
+          $ref: '#/components/schemas/Dewey'
 
