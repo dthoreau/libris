@@ -81,13 +81,6 @@ def upgrade() -> None:
                   nullable=False))
 
     op.create_table(
-        'book_awards',
-        sa.Column('book', sa.UUID, sa.ForeignKey("books.id"),
-                  nullable=False),
-        sa.Column('award', sa.UUID, sa.ForeignKey("awards.id"),
-                  nullable=False))
-
-    op.create_table(
         'identifier_types',
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
                   default=uuid.uuid4),
@@ -108,23 +101,6 @@ def upgrade() -> None:
         sa.Column('name', sa.String(), nullable=False)
     )
 
-    for remote in ['genre', 'serie', 'subject']:
-        op.create_table(
-            f'book_{remote}s',
-            sa.Column('book', UUID(as_uuid=False),
-                      sa.ForeignKey('books.id'), nullable=False),
-            sa.Column(remote, UUID(as_uuid=False),
-                      sa.ForeignKey(f'{remote}s.id'), nullable=False),
-        )
-
-    op.create_table(
-        'book_dewey',
-        sa.Column('book', UUID(as_uuid=False),
-                  sa.ForeignKey('books.id'), nullable=False),
-        sa.Column('dewey', UUID(as_uuid=False),
-                  sa.ForeignKey('dewey_keywords.id'), nullable=False),
-    )
-
     op.create_table(
         'identifier',
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
@@ -136,9 +112,37 @@ def upgrade() -> None:
                   sa.ForeignKey('identifier_types.id'), nullable=False)
     )
 
+
+    create_pivot('book_awards',
+                 'book', "books.id",
+                 'award', "awards.id")
+    create_pivot('book_genre',
+                 'book', "books.id",
+                 'genre', "genres.id")
+    create_pivot('book_dewey',
+                 'book', "books.id",
+                 'dewey', "dewey_keywords.id")
+    create_pivot('book_series',
+                 'book', "books.id",
+                 'series', "series.id")
+    create_pivot('book_subjects',
+                 'book', "books.id",
+                 'subject', "subjects.id")
+
 # author_roles book_dewey book_genre book_series book_subjects identifier
 # identifier_types series
 
 
 def downgrade() -> None:
     pass
+
+
+def create_pivot(table_name, left, left_name, right, right_name):
+    table = op.create_table(
+        table_name,
+        sa.Column(left, sa.UUID(as_uuid=False),
+                  sa.ForeignKey(left_name), nullable=False),
+        sa.Column(right, sa.UUID(as_uuid=False),
+                  sa.ForeignKey(right_name), nullable=False))
+
+    return table

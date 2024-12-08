@@ -116,7 +116,7 @@ sub main {
                     'book_dewey',
                     {
                         book    => $book_id,
-                        keyword => $wid
+                        dewey => $wid
                     }
                 );
                 $counts->{keyword}++;
