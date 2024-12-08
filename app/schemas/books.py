@@ -11,7 +11,7 @@ class AuthorCreate(AuthorBase):
 
 
 class Author(AuthorBase):
-    id: int
+    id: str
 
 
 class AuthorExtended(Author):

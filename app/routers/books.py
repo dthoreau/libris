@@ -1,7 +1,8 @@
 import logging
-from fastapi import APIRouter
+from typing import Annotated
+from fastapi import APIRouter, Depends
 
-from app import schemas, services
+from app import schemas, services, dependencies
 
 
 logger = logging.getLogger(__name__)
@@ -9,6 +10,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/books", tags=["Books"])
-def get_all_books() -> list[schemas.books.Author]:
-    return services.all_books()
+@router.get("/books", tags=["Books"]) 
+def get_all_books(common: Annotated[dict, Depends(dependencies.common)]) -> list[schemas.Author]:
+    return services.all_books(common)

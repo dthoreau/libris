@@ -1,5 +1,6 @@
 # app/schemas/__init__.py
 
-from . import books
+from .books import Author
 
-__all__ = ['books']
+
+__all__ = ['Author']

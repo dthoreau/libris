@@ -56,7 +56,6 @@ sub main {
                 $values->{$key} = $book->{$key};
         }
 
-
         $book_id = $db->insert_entry( 'books', $values );
         $counts->{books}++;
 

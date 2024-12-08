@@ -1,13 +1,11 @@
-from typing import Annotated
+from fastapi import FastAPI
 
-from fastapi import FastAPI, Depends
-from sqlalchemy import Connection
+from sqlalchemy import Engine
+from typing import Any
 
-# from .database import make_postgres_connection
+from .database import make_postgres_connection
 app = FastAPI()
 
 
-async def common_parameters(conn: Connection):
-    return {"conn": conn}
-
-CommonsDep = Annotated[dict, Depends(common_parameters)]
+async def common(q: Engine | None = None):
+    return {"dbh": make_postgres_connection()}

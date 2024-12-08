@@ -1,10 +1,9 @@
-from sqlalchemy import create_engine, Connection
+from sqlalchemy import create_engine, Connection, Engine
 
 
-def make_postgres_connection() -> Connection:
+def make_postgres_connection() -> Engine:
     engine = create_engine(
         "postgresql+psycopg2://libris@localhost/libris",
         echo=True)
 
-    with engine.connect() as conn:
-        return conn
+    return engine
