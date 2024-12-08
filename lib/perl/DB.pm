@@ -13,6 +13,7 @@ $Data::Dumper::Sortkeys = 1;
 
 use JSON;
 use List::Util;
+use UUID qw(uuid4);
 
 sub new {
 #TODO switch autocommit off
@@ -55,6 +56,10 @@ sub insert_entry {
       . join( ', ', @fnames )
       . " ) values ( "
       . join( ', ', @qlist ) . ' )';
+
+    if (not ($table ~= /_/)) {
+        $values->{id} = uuid4();
+    }
 
     my $csr = $db->prepare($sql)     || fatal( $db->errstr );
     my $id  = $csr->execute(@fields) || fatal( $db->errstr );

@@ -1,11 +1,13 @@
 from typing import Annotated
 
-from fastapi import Header
+from fastapi import FastAPI, Depends
+from sqlalchemy import Connection
+
+# from .database import make_postgres_connection
+app = FastAPI()
 
 
-async def get_token_header(x_token: Annotated[str, Header()]):
-    pass
+async def common_parameters(conn: Connection):
+    return {"conn": conn}
 
-
-async def get_query_token(token: str):
-    pass
+CommonsDep = Annotated[dict, Depends(common_parameters)]

@@ -11,11 +11,11 @@ class AuthorCreate(AuthorBase):
 
 
 class Author(AuthorBase):
-    id: UUID4
+    id: int
 
 
 class AuthorExtended(Author):
-    books: Optional[list[UUID4]] = []
+    books: Optional[list[int]] = []
 
 
 class BookBase(BaseModel):

@@ -1,5 +1,11 @@
+import logging
+
+log = logging.getLogger('api')
+
+
 def all_books():
-    pass
+    log.warning('service layer')
+    return []
 
 
 def add_book():

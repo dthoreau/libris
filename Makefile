@@ -3,10 +3,7 @@
 PYTHON := $(shell readlink .venv/bin/python3.10)
 
 uvicorn:
-	fastapi run app/main.py
-
-dev:
-	fastapi dev app/main.py
+	python -m app
 
 tests: pytest mypy flake8
 
