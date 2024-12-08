@@ -49,7 +49,15 @@ sub main {
 
         if ( defined $book_id ) { next; }
 
-        $book_id = $db->insert_entry( 'books', { title => $title, } );
+        my $values = {title=>$title};
+        foreach my $key (qw( ean upc asin  pages height length summary
+                    thickness page_count description publication
+                    publication_date )) {
+                $values->{$key} = $book->{$key};
+        }
+
+
+        $book_id = $db->insert_entry( 'books', $values );
         $counts->{books}++;
 
         my $s_list = collapse_ends($book_subjects);
