@@ -22,40 +22,13 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_table(
-        'authors',
-        sa.Column('id', UUID(as_uuid=False), primary_key=True,
-                  default=uuid.uuid4),
-        sa.Column('name', sa.String(), nullable=False)
-    )
-
-    op.create_table(
-        'awards',
-        sa.Column('id', UUID(as_uuid=False), primary_key=True,
-                  default=uuid.uuid4),
-        sa.Column('name', sa.String(), nullable=False)
-    )
-    op.create_table(
-        'genres',
-        sa.Column('id', UUID(as_uuid=False), primary_key=True,
-                  default=uuid.uuid4),
-        sa.Column('name', sa.String(), nullable=False)
-    )
-    op.create_table(
-        'subjects',
-        sa.Column('id', UUID(as_uuid=False), primary_key=True,
-                  default=uuid.uuid4),
-        sa.Column('name', sa.String(), nullable=False)
-    )
-
-    op.create_table(
-        'series',
-        sa.Column('id', UUID(as_uuid=False), primary_key=True,
-                  default=uuid.uuid4),
-        sa.Column('name', sa.String(), nullable=False)
-    )
-
-    op.create_table(
+    authors = simple_table('authors')
+    awards = simple_table('awards')
+    genres = simple_table('genres')
+    subjects = simple_table('subjects')
+    series = simple_table('series')
+    
+    books = op.create_table(
         'books',
         sa.Column('id', sa.UUID(as_uuid=False), primary_key=True),
         sa.Column('title', sa.String, nullable=False),
@@ -73,35 +46,35 @@ def upgrade() -> None:
         sa.Column('publication', sa.String, nullable=True),
         sa.Column('publication_date', sa.String, nullable=True),
     )
-    op.create_table(
+    authorship = op.create_table(
         'authorship',
         sa.Column('book', sa.UUID, sa.ForeignKey("books.id"),
                   nullable=False),
         sa.Column('author', sa.UUID, sa.ForeignKey("authors.id"),
                   nullable=False))
 
-    op.create_table(
+    identifier_types = op.create_table(
         'identifier_types',
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
                   default=uuid.uuid4),
         sa.Column('name', sa.String(), nullable=False)
     )
 
-    op.create_table(
+    author_roles = op.create_table(
         'author_roles',
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
                   default=uuid.uuid4),
         sa.Column('name', sa.String(), nullable=False)
     )
 
-    op.create_table(
+    dewey_keywords = op.create_table(
         'dewey_keywords',
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
                   default=uuid.uuid4),
         sa.Column('name', sa.String(), nullable=False)
     )
 
-    op.create_table(
+    identifier = op.create_table(
         'identifier',
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
                   default=uuid.uuid4),
@@ -112,30 +85,37 @@ def upgrade() -> None:
                   sa.ForeignKey('identifier_types.id'), nullable=False)
     )
 
-
-    create_pivot('book_awards',
+    book_awards = create_pivot('book_awards',
                  'book', "books.id",
                  'award', "awards.id")
-    create_pivot('book_genre',
+    book_genre = create_pivot('book_genre',
                  'book', "books.id",
                  'genre', "genres.id")
-    create_pivot('book_dewey',
+    book_dewey = create_pivot('book_dewey',
                  'book', "books.id",
                  'dewey', "dewey_keywords.id")
-    create_pivot('book_series',
+    book_series = create_pivot('book_series',
                  'book', "books.id",
                  'series', "series.id")
-    create_pivot('book_subjects',
+    book_subjects = create_pivot('book_subjects',
                  'book', "books.id",
                  'subject', "subjects.id")
-
-# author_roles book_dewey book_genre book_series book_subjects identifier
-# identifier_types series
 
 
 def downgrade() -> None:
     pass
 
+
+def simple_table(table_name: str) -> None:
+    table = op.create_table(
+        table_name,
+        sa.Column('id', UUID(as_uuid=False), primary_key=True,
+                  default=uuid.uuid4),
+        sa.Column('name', sa.String(), nullable=False)
+    )
+
+    return table
+                            
 
 def create_pivot(table_name, left, left_name, right, right_name):
     table = op.create_table(
