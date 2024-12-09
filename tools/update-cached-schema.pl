@@ -8,7 +8,8 @@ $| = 1;
 use Data::Dumper;
 use JSON;
 
-use lib q{../lib/perl};
+use lib '../lib/perl';
+use lib 'lib/perl';
 
 use DB;
 use Util qw{get_hashvals get_hashval};

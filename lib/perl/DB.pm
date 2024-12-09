@@ -13,6 +13,7 @@ $Data::Dumper::Sortkeys = 1;
 
 use JSON;
 use List::Util;
+use UUID qw(uuid);
 
 sub new {
 #TODO switch autocommit off
@@ -50,6 +51,18 @@ sub insert_entry {
         push @qlist,  '?';
         push @fields, $values->{$field};
     }
+    my $uuid = uuid();
+    my $sch = $self->{schema}{$table};
+    if (exists $sch->{primary_key}) {
+        if ($sch->{fields}{$sch->{primary_key}}{type} eq 'uuid')  {
+            push @fnames, 'id';
+            push @qlist, '?';
+            push @fields, $uuid;
+        }
+    }
+
+
+
     my $sql =
         "INSERT INTO $table ("
       . join( ', ', @fnames )
@@ -61,7 +74,7 @@ sub insert_entry {
 
 # TODO close the cursor
     if ( exists $self->{schema}{$table}{fields}{id} ) {
-        return $db->last_insert_id( undef, undef, $table, undef );
+        return $uuid;
     }
     else {
         return;
