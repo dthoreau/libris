@@ -123,6 +123,27 @@ def get_all_books(common: Any) -> list[schemas.Book]:
     raise NotImplementedError
 
 
+def get_book_by_id(common: Any, book_id: str) -> schemas.Book:
+    query = Select(
+        books.c.id,
+        books.c.title,
+        books.c.pages,
+        books.c.original_isbn,
+        books.c.ean,
+        books.c.upc,
+        books.c.asin,
+        books.c.height,
+        books.c.length,
+        books.c.summary,
+        books.c.thickness,
+        books.c.page_count,
+        books.c.description,
+        books.c.publication,
+        books.c.publication_date,
+    ).where(books.c.id == book_id)
+    return _get_one(common, query, schemas.Book)
+
+
 def _get_all(common: dict[str, Any],
              query: Select,             
              model_type: Type[ModelType]) -> list[ModelType]:
@@ -135,3 +156,11 @@ def _get_all(common: dict[str, Any],
             collection.append(model_type.model_validate(row._asdict()))
 
         return collection
+
+def _get_one(common: dict[str, Any],
+             query: Select, 
+             model_type: Type[ModelType]) -> ModelType:
+    eng: Engine = common["eng"]
+    with eng.connect() as dbh:
+        for row in dbh.execute(query):
+            return model_type.model_validate(row._asdict())

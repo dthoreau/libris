@@ -8,6 +8,9 @@ log = logging.getLogger('api')
 def all_authors(common) -> list[schemas.Author]:
     return database.get_all_authors(common)
 
+def get_book(common, id: str):
+    return database.get_book_by_id(common, id)
+
 
 def add_author(common):
     pass
