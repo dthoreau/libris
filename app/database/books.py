@@ -42,6 +42,13 @@ subjects = Table(
            default=uuid.uuid4),
     Column('name', String(), nullable=False))
 
+series = Table(
+    'series', metadata_obj,
+    Column('id', UUID(as_uuid=False), primary_key=True,
+           default=uuid.uuid4),
+    Column('name', String(), nullable=False)
+)
+
 book_authors = Table(
     'book_authors', metadata_obj,
     Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
@@ -77,42 +84,53 @@ books = Table(
 )
 
 
-def get_all_authors(common: Any) -> list[schemas.Author]:
-    eng = common["eng"]
+def get_all_authors(common: Any) -> list[schemas.Author]:    
 
     stmt = Select(authors.c.id, authors.c.name)
-    return _get_all(eng, stmt, schemas.Author)
+    return _get_all(common, stmt, schemas.Author)
 
 
 def get_all_awards(common: Any) -> list[schemas.Award]:
     return _get_all(
-        common["eng"],
+        common,
         Select(awards.c.id, awards.c.name),
         schemas.Award)
 
 
 def get_all_subjects(common: Any) -> list[schemas.Subject]:
-    raise NotImplementedError
+    return _get_all(
+        common,
+        Select(subjects.c.id, subjects.c.name),
+        schemas.Subject)
 
 
 def get_all_series(common: Any) -> list[schemas.Series]:
-    raise NotImplementedError
+    return _get_all(
+        common,
+        Select(series.c.id, series.c.name),
+        schemas.Series)
 
 
 def get_all_genres(common: Any) -> list[schemas.Genre]:
-    raise NotImplementedError
+    return _get_all(
+        common,
+        Select(genres.c.id, genres.c.name),
+        schemas.Genre
+    )
 
 
 def get_all_books(common: Any) -> list[schemas.Book]:
     raise NotImplementedError
 
 
-def _get_all(eng: Engine,
-             query: Any,
+def _get_all(common: dict[str, Any],
+             query: Select,             
              model_type: Type[ModelType]) -> list[ModelType]:
     collection = []
+    eng: Engine = common["eng"]
     with eng.connect() as dbh:
         logger.warning(f'{query=}')
+        query = query.limit(common["limit"]).offset(common["skip"])
         for row in dbh.execute(query):
             collection.append(model_type.model_validate(row._asdict()))
 

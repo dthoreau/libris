@@ -42,18 +42,18 @@ def get_all_awards(
 def get_all_genres(
     common: Annotated[dict, Depends(common_parameters)]) \
         -> list[schemas.Genre]:
-    raise NotImplementedError
+    return services.all_genres(common)
 
 
 @router.get("/subjects", tags=["Subjects"])
 def get_all_subjects(
     common: Annotated[dict, Depends(common_parameters)]) -> \
         list[schemas.Subject]:
-    raise NotImplementedError
+    return services.all_subjects(common)
 
 
 @router.get("/series", tags=["Series"])
 def get_all_series(
     common: Annotated[dict, Depends(common_parameters)]) -> \
         list[schemas.Series]:
-    raise NotImplementedError
+    return services.all_series(common)
