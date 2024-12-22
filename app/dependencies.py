@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 
 from sqlalchemy import Engine
-from typing import Any
 
 from .database import make_postgres_connection
 app = FastAPI()
