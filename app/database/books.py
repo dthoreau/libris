@@ -84,7 +84,7 @@ books = Table(
 )
 
 
-def get_all_authors(common: Any) -> list[schemas.Author]:    
+def get_all_authors(common: Any) -> list[schemas.Author]:
 
     stmt = Select(authors.c.id, authors.c.name)
     return _get_all(common, stmt, schemas.Author)
@@ -145,7 +145,7 @@ def get_book_by_id(common: Any, book_id: str) -> schemas.Book:
 
 
 def _get_all(common: dict[str, Any],
-             query: Select,             
+             query: Select,
              model_type: Type[ModelType]) -> list[ModelType]:
     collection = []
     eng: Engine = common["eng"]
@@ -157,8 +157,9 @@ def _get_all(common: dict[str, Any],
 
         return collection
 
+
 def _get_one(common: dict[str, Any],
-             query: Select, 
+             query: Select,
              model_type: Type[ModelType]) -> ModelType:
     eng: Engine = common["eng"]
     with eng.connect() as dbh:

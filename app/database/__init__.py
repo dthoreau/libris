@@ -2,7 +2,7 @@ from .engine import make_postgres_connection
 
 
 from .books import (
-    get_all_authors, get_all_awards, get_all_genres, 
+    get_all_authors, get_all_awards, get_all_genres,
     get_all_series, get_all_subjects, get_book_by_id)
 from .metadata import init
 

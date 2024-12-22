@@ -1,6 +1,6 @@
 
 fastapi==0.115.2
-starlette-admin==0.14.1
+starlette-admin
 
 itsdangerous==2.1.2
 
@@ -16,4 +16,3 @@ alembic==1.11.2
 requests==2.32.2
 
 fastapi[standard]
-uvicorn

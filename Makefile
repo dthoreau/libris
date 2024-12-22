@@ -1,6 +1,6 @@
 # Makefile
 
-PYTHON := $(shell readlink .venv/bin/python3.10)
+PYTHON := $(shell readlink .venv/bin/python3.12)
 
 uvicorn:
 	python -m app

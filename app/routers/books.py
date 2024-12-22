@@ -30,10 +30,10 @@ def get_all_books(
         -> list[schemas.Book]:
     raise NotImplementedError
 
+
 @router.get("/book/{id}", tags=["Books"])
-def get_book(
-    common: Annotated[dict, Depends(common_parameters)],
-    id: str) -> schemas.Book:
+def get_book(common: Annotated[dict, Depends(common_parameters)],
+             id: str) -> schemas.Book:
     return services.get_book(common, id)
 
 
