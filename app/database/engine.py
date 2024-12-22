@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Connection, Engine
+from sqlalchemy import create_engine, Engine
 
 
 def make_postgres_connection() -> Engine:

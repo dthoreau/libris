@@ -35,5 +35,6 @@ db-clean:
 	psql libris -U libris -f tools/schema/0002-schema.sql
 	perl ./tools/update-cached-schema.pl --doit
 
-
+librarything:
+	cd tools; ./import-librarything-json.pl ~/librarything_dthoreau.json
 

@@ -68,3 +68,27 @@ class Award(AwardBase):
 
 class AwardExtended(Award):
     books: Optional[list[UUID4]] = []
+
+
+class GenreBase(BaseModel):
+    name: str
+
+
+class Genre(GenreBase):
+    id: UUID4
+
+
+class SubjectBase(BaseModel):
+    name: str
+
+
+class Subject(SubjectBase):
+    id: UUID4
+
+
+class SeriesBase(BaseModel):
+    name: str
+
+
+class Series(SeriesBase):
+    id: UUID4
