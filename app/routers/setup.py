@@ -1,12 +1,14 @@
 import logging
 from fastapi import FastAPI
 
-from . import books
+
 
 from app.database import make_postgres_connection
 from starlette_admin.contrib.sqla import Admin
 
 from .admin import setup_admin
+
+from . import authors, awards, books, genres, series, subjects
 
 
 libris_version = '0.0.1'
@@ -26,7 +28,12 @@ admin = Admin(engine, 'Libris')
 
 setup_admin(admin)
 
-for router in [books.router]:
+for router in [authors.router,
+               awards.router,
+               books.router,
+               genres.router,
+               series.router,
+               subjects.router]:
     app.include_router(router)
 
 admin.mount_to(app)

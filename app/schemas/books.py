@@ -2,22 +2,6 @@ from typing import Optional
 from pydantic import BaseModel, UUID4
 
 
-class AuthorBase(BaseModel):
-    name: str
-
-
-class AuthorCreate(AuthorBase):
-    pass
-
-
-class Author(AuthorBase):
-    id: str
-
-
-class AuthorExtended(Author):
-    books: Optional[list[int]] = []
-
-
 class BookBase(BaseModel):
     title: str
     pages: Optional[str] = None
@@ -54,41 +38,3 @@ class BookExtended(Book):
     award: list[UUID4] = []
 
 
-class AwardBase(BaseModel):
-    name: str
-
-
-class AwardCreate(AwardBase):
-    pass
-
-
-class Award(AwardBase):
-    id: UUID4
-
-
-class AwardExtended(Award):
-    books: Optional[list[UUID4]] = []
-
-
-class GenreBase(BaseModel):
-    name: str
-
-
-class Genre(GenreBase):
-    id: UUID4
-
-
-class SubjectBase(BaseModel):
-    name: str
-
-
-class Subject(SubjectBase):
-    id: UUID4
-
-
-class SeriesBase(BaseModel):
-    name: str
-
-
-class Series(SeriesBase):
-    id: UUID4
