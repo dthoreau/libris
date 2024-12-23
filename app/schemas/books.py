@@ -4,6 +4,13 @@ from pydantic import BaseModel, UUID4
 
 class BookBase(BaseModel):
     title: str
+
+
+class Book(BookBase):
+    id: UUID4
+
+
+class BookDetail(Book):
     pages: Optional[str] = None
     original_isbn: Optional[str] = None
     ean: Optional[str] = None
@@ -27,10 +34,6 @@ class BookPatchOptional(BaseModel):
 
 class BookCreate(BookBase):
     pass
-
-
-class Book(BookBase):
-    id: UUID4
 
 
 class BookExtended(Book):

@@ -2,6 +2,7 @@ from starlette_admin.contrib.sqla import Admin, ModelView
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Mapped, mapped_column
 
+
 Base = declarative_base()
 
 
@@ -38,6 +39,7 @@ class Genre(Base):
 def setup_admin(admin: Admin):
     admin.add_view(ModelView(Author, icon='fa-regular fa-user'))
     admin.add_view(ModelView(Award, icon='faa-regular fa-star'))
-    admin.add_view(ModelView(Series, icon='fas fa-list',label='Series'))
+    admin.add_view(ModelView(Series, icon='fas fa-list',
+                             label='Series'))
     admin.add_view(ModelView(Subject, icon='fas fa-list'))
     admin.add_view(ModelView(Genre, icon='fas fa-list'))
