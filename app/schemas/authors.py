@@ -16,5 +16,3 @@ class Author(AuthorBase):
 
 class AuthorExtended(Author):
     books: Optional[list[UUID4]] = []
-
-

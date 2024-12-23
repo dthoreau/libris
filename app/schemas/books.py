@@ -36,5 +36,3 @@ class Book(BookBase):
 class BookExtended(Book):
     author: list[UUID4] = []
     award: list[UUID4] = []
-
-

@@ -5,18 +5,16 @@ from .genres import all_genres
 from .series import all_series
 from .subjects import all_subjects
 
-
-
 __all__ = [
-    'all_authors', 
-    
-    'all_awards', 
+    'all_authors',
+
+    'all_awards',
 
     'get_book',
-    
-    'all_genres', 
-    
+
+    'all_genres',
+
     'all_series',
-    
-    'all_subjects', 
+
+    'all_subjects',
 ]

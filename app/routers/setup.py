@@ -1,8 +1,6 @@
 import logging
 from fastapi import FastAPI
 
-
-
 from app.database import make_postgres_connection
 from starlette_admin.contrib.sqla import Admin
 
