@@ -30,3 +30,23 @@ def get_award_books(
     common: Annotated[dict, Depends(deps.common)], award: str) -> \
         list[schemas.Book]:
     return services.get_award_books(common, award)
+
+
+@router.get("/awards/{award_id}", tags=["Awards"])
+def get_award_by_id():
+    return NotImplementedError
+
+
+@router.delete("/awards/{award_id}", tags=["Awards"])
+def delete_award():
+    return NotImplementedError
+
+
+@router.post("/awards", tags=["Awards"])
+def create_award():
+    return NotImplementedError
+
+
+@router.put("/awards/{award_id}", tags=["Awards"])
+def update_award():
+    return NotImplementedError

@@ -1,7 +1,7 @@
 from typing import Any
 from sqlalchemy import Select
 
-from database import get_all, tables
+from app.database import get_all, tables
 from app import schemas
 
 import logging

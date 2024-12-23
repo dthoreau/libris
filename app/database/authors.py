@@ -4,7 +4,7 @@ from typing import Any
 from . import get_all
 
 from app import schemas
-from database import tables
+from app.database import tables
 
 
 def get_all_authors(common: Any) -> list[schemas.Author]:
