@@ -33,7 +33,7 @@ def get_genre_books(
 
 
 @router.get("/genres/{genre_id}", tags=["Genres"])
-def get_genre_by_id():
+def get_genre_by_id() -> list[schemas.Genre]:
     return NotImplementedError
 
 

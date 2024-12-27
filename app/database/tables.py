@@ -61,6 +61,27 @@ book_awards = Table(
     Column('award', UUID(as_uuid=False), ForeignKey("awards.id"),
            nullable=False))
 
+book_series = Table(
+    'book_series', metadata_obj,
+    Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
+           nullable=False),
+    Column('serues', UUID(as_uuid=False), ForeignKey("series.id"),
+           nullable=False))
+
+book_subjects = Table(
+    'book_subject', metadata_obj,
+    Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
+           nullable=False),
+    Column('subject', UUID(as_uuid=False), ForeignKey("subject.id"),
+           nullable=False))
+
+book_genres = Table(
+    'book_genres', metadata_obj,
+    Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
+           nullable=False),
+    Column('genre', UUID(as_uuid=False), ForeignKey("genres.id"),
+           nullable=False))
+
 books = Table(
     'books',
     metadata_obj,

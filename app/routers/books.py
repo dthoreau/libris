@@ -21,7 +21,7 @@ async def common_parameters(
 def get_all_books(
     common: Annotated[dict, Depends(common_parameters)]) \
         -> list[schemas.Book]:
-    raise NotImplementedError
+    return services.all_books(common)
 
 
 @router.get("/book/{id}", tags=["Books"])
