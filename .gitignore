@@ -2,3 +2,4 @@
 tags
 .venv
 *.pyc
+test-converage/*

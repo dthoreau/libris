@@ -7,6 +7,8 @@ uvicorn:
 
 tests: pytest mypy flake8
 
+pytest:
+	python -m pytest
 
 mypy:
 	-mypy .
@@ -27,7 +29,7 @@ clean-venv:
 
 pip-install:
 	python -m pip install --upgrade pip
-		pip install -r requirements.txt -r requirements-testing.txt
+	pip install -r requirements.txt -r requirements-testing.txt
 
 db-clean:
 	echo "drop database libris; create database libris" | psql postgres -U libris

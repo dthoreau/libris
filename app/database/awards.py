@@ -5,7 +5,7 @@ from sqlalchemy import Select
 from . import get_one, get_all
 
 from app import schemas
-from database import tables
+from app.database import tables
 
 import logging
 logger = logging.getLogger()
