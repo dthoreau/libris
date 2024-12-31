@@ -21,8 +21,8 @@ def get_series_books(common: Any) -> list[schemas.Book]:
                    ).join(
                        tables.book_series,
                        tables.books.c.id == tables.book_series.c.book
-                  ).where(tables.book_series.c.book == id)
-    return get_all(common, query)
+                  ).where(tables.book_series.c.series == id)
+    return get_all(common, query, schemas.Book)
 
 
 def get_series_by_id(common: Any, id: str) -> schemas.Series:
@@ -31,4 +31,4 @@ def get_series_by_id(common: Any, id: str) -> schemas.Series:
             tables.series.c.name
         ).where(tables.series.c.id == id)
 
-    return get_one(common, query)
+    return get_one(common, query, schemas.Series)

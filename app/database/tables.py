@@ -76,7 +76,7 @@ book_subjects = Table(
            nullable=False))
 
 book_genres = Table(
-    'book_genres', metadata_obj,
+    'book_genre', metadata_obj,
     Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
            nullable=False),
     Column('genre', UUID(as_uuid=False), ForeignKey("genres.id"),

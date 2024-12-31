@@ -19,7 +19,7 @@ def get_author_by_id(common: Any, id: str) -> schemas.Author:
         tables.authors.c.name).where(
             tables.authors.id == id)
 
-    return get_one(common, query)
+    return get_one(common, query, schemas.Author)
 
 
 def get_author_books(common, id: str) -> list[schemas.Book]:
@@ -28,5 +28,5 @@ def get_author_books(common, id: str) -> list[schemas.Book]:
                    ).join(
                        tables.book_authors,
                        tables.books.c.id == tables.book_authors.c.book
-                  ).where(tables.book_authors.c.book == id)
-    return get_all(common, query)
+                  ).where(tables.book_authors.c.author == id)
+    return get_all(common, query, schemas.Book)

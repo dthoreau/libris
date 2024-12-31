@@ -23,8 +23,8 @@ def get_genre_books(common: Any, id: str) -> list[schemas.Book]:
                    ).join(
                        tables.book_genres,
                        tables.books.c.id == tables.book_genres.c.book
-                  ).where(tables.book_genres.c.book == id)
-    return get_all(common, query)
+                  ).where(tables.book_genres.c.genre == id)
+    return get_all(common, query, schemas.Book)
 
 
 def get_genre_by_id(common: Any, id: str) -> list[schemas.Genre]:
@@ -32,4 +32,4 @@ def get_genre_by_id(common: Any, id: str) -> list[schemas.Genre]:
         tables.genres.c.id, tables.genres.c.name).where(
             tables.genres.c.id == id)
 
-    return (common, query)
+    return (common, query, schemas.Genre)
