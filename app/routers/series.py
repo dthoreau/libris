@@ -24,9 +24,9 @@ def get_series(ds: deps.DataSource,  series_id: str) -> schemas.Series:
 
 
 @router.get("/series/{series}/books", tags=["Series"])
-def get_series_books(ds: deps.DataSource,
+def get_series_books(ds: deps.DataSource, slice: deps.Slice,
                      series: str) -> list[schemas.Book]:
-    return services.get_series_books(ds, series)
+    return services.get_series_books(ds, slice, series)
 
 
 @router.get("/series/{series_id}", tags=["Series"])

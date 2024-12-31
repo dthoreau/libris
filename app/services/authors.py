@@ -8,8 +8,8 @@ def all_authors(datasource, slice) -> list[schemas.Author]:
     return database.get_all_authors(datasource, slice)
 
 
-def get_author(datasource, id: str) -> schemas.Author:
-    return database.get_author_by_id(datasource, id)
+def get_author(datasource, slice, id: str) -> schemas.Author:
+    return database.get_author_by_id(datasource, slice, id)
 
 
 def add_author(datasource,

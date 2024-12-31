@@ -22,14 +22,14 @@ def get_subject_by_id(ds: Any, id: str) -> schemas.Subject:
     return get_one(ds, query, schemas.Subject)
 
 
-def get_subject_books(ds: Any, id: str) -> list[schemas.Book]:
+def get_subject_books(ds, slice, id: str) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_subjects,
                        tables.books.c.id == tables.book_subjects.c.book
                   ).where(tables.book_subjects.c.subject == id)
-    return get_all(ds, query, schemas.Book)
+    return get_all(ds, query, schemas.Book, slice)
 
 
 def add_subject(ds: Any,

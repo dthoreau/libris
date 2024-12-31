@@ -16,14 +16,14 @@ def get_all_series(ds, slice) -> list[schemas.Series]:
         slice)
 
 
-def get_series_books(ds: Any) -> list[schemas.Book]:
+def get_series_books(ds, slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_series,
                        tables.books.c.id == tables.book_series.c.book
                   ).where(tables.book_series.c.series == id)
-    return get_all(ds, query, schemas.Book)
+    return get_all(ds, query, schemas.Book, slice)
 
 
 def get_series_by_id(ds: Any, id: str) -> schemas.Series:

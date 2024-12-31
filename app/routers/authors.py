@@ -17,10 +17,10 @@ def get_all_authors(ds: deps.DataSource,
 
 
 @router.get("/authors/{author_id}", tags=["Authors"])
-def get_author_by_id(ds: deps.DataSource,
+def get_author_by_id(ds: deps.DataSource, slice: deps.Slice,
                      id: str) -> list[schemas.Author]:
 
-    return services.get_author(ds, id)
+    return services.get_author(ds, slice, id)
 
 
 @router.delete("/authors/{author_id}", tags=["Authors"])
