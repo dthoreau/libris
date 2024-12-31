@@ -18,14 +18,15 @@ def make_postgres_connection() -> Engine:
     return engine
 
 
-def get_all(common: dict[str, Any],
+def get_all(ds: dict[str, Any],
             query: Select,
-            model_type: Type[ModelType]) -> list[ModelType]:
+            model_type: Type[ModelType],
+            slice) -> list[ModelType]:
     collection = []
-    eng: Engine = common["eng"]
-    with eng.connect() as dbh:
+    dbh: Engine = ds["handle"]
+    with dbh.connect() as dbh:
         logger.warning(f'{query=}')
-        query = query.limit(common["limit"]).offset(common["skip"])
+        query = query.limit(slice["limit"]).offset(slice["skip"])
         for row in dbh.execute(query):
             temp = model_type.model_validate(row._asdict())
             collection.append(temp)
@@ -36,7 +37,7 @@ def get_all(common: dict[str, Any],
 def get_one(common: dict[str, Any],
             query: Select,
             model_type: Type[ModelType]) -> ModelType:
-    eng: Engine = common["eng"]
+    eng: Engine = common["handle"]
     with eng.connect() as dbh:
         for row in dbh.execute(query):
             return model_type.model_validate(row._asdict())
@@ -45,7 +46,7 @@ def get_one(common: dict[str, Any],
 def insert(common: dict[str, Any],
            table: Table, new_record: BaseModel) -> None:
     stmt = Insert(table).values(new_record.model_dump())
-    eng: Engine = common["eng"]
+    eng: Engine = common["handle"]
     with eng.connect() as dbh:
         dbh.execute(stmt)
         dbh.commit()

@@ -2,13 +2,21 @@ from .engine import make_postgres_connection, get_all, get_one, insert
 
 from .books import get_book_by_id, get_all_books
 
-from .awards import (get_all_awards, get_award_books, get_award_by_id)
+from .awards import (get_all_awards, get_award_books, get_award_by_id,
+                     add_award, find_award_by_name)
+
 from .authors import (get_all_authors, get_author_books,
-                      get_author_by_id, add_author)
-from .genres import get_all_genres, get_genre_books, get_genre_by_id
-from .series import get_all_series, get_series_books, get_series_by_id
+                      get_author_by_id, add_author, find_author_by_name)
+
+from .genres import (get_all_genres, get_genre_books, get_genre_by_id,
+                     add_genre, find_genre_by_name)
+
+from .series import (get_all_series, get_series_books, get_series_by_id,
+                     add_series, find_series_by_name)
+
 from .subjects import (get_all_subjects, get_subject_books,
-                       get_subject_by_id)
+                       get_subject_by_id, add_subject,
+                       find_subject_by_name)
 
 from .tables import (book_authors, book_awards, books, authors, awards,
                      series, subjects, genres)
@@ -19,22 +27,31 @@ __all__ = ['make_postgres_connection', 'init',
            'get_author_books',
            'get_author_by_id',
            'add_author',
+           'find_author_by_name',
 
            'get_all_awards',
            'get_award_books',
            'get_award_by_id',
+           'add_award',
+           'find_award_by_name',
 
            'get_all_genres',
            'get_genre_books',
            'get_genre_by_id',
+           'add_genre',
+           'find_genre_by_name',
 
            'get_all_series',
            'get_series_books',
            'get_series_by_id',
+           'add_series',
+           'find_series_by_name',
 
            'get_all_subjects',
            'get_subject_books',
            'get_subject_by_id',
+           'add_subject',
+           'find_subject_by_name',
 
            'get_book_by_id',
            'get_all_books',

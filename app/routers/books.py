@@ -1,9 +1,9 @@
 import logging
-from typing import Annotated
-from fastapi import APIRouter, Depends
+
+from fastapi import APIRouter
 
 from app import schemas, services
-from app.database import make_postgres_connection
+from app.util import deps
 
 
 logger = logging.getLogger(__name__)
@@ -11,20 +11,12 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-async def common_parameters(
-        skip: int = 0, limit: int = 100):
-    eng = make_postgres_connection()
-    return {"skip": skip, "limit": limit, "eng": eng}
-
-
 @router.get("/books", tags=["Books"])
-def get_all_books(
-    common: Annotated[dict, Depends(common_parameters)]) \
-        -> list[schemas.Book]:
-    return services.all_books(common)
+def get_all_books(ds: deps.DataSource,
+                  slice: deps.Slice) -> list[schemas.Book]:
+    return services.all_books(ds, slice)
 
 
 @router.get("/book/{id}", tags=["Books"])
-def get_book(common: Annotated[dict, Depends(common_parameters)],
-             id: str) -> schemas.BookDetail:
-    return services.get_book(common, id)
+def get_book(ds: deps.DataSource, id: str) -> schemas.BookDetail:
+    return services.get_book(ds, id)
