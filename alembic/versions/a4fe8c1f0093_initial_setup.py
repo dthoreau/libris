@@ -110,8 +110,8 @@ def simple_table(table_name: str) -> None:
     table = op.create_table(
         table_name,
         sa.Column('id', UUID(as_uuid=False), primary_key=True,
-                  default=uuid.uuid4),
-        sa.Column('name', sa.String(), nullable=False)
+                  default=uuid.uuid4, unique=True),
+        sa.Column('name', sa.String(), nullable=False, unique=True)
     )
 
     return table

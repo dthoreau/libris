@@ -40,3 +40,5 @@ db-clean:
 librarything:
 	cd tools; ./import-librarything-json.pl ~/librarything_dthoreau.json
 
+git-hooks:
+	cd tools; ./add-git-hooks.sh

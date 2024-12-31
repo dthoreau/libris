@@ -12,5 +12,6 @@ def get_author(common, id: str) -> schemas.Author:
     return database.get_author_by_id(common, id)
 
 
-def add_author(common):
-    pass
+def add_author(common,
+               new_author: schemas.AuthorCreate) -> None:
+    return database.add_author(common, new_author)

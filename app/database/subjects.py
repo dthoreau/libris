@@ -19,7 +19,7 @@ def get_subject_by_id(common: Any, id: str) -> schemas.Subject:
     query = Select(tables.subjects.c.id, tables.subjects.c.name).where(
         tables.subjects.c.id == id)
 
-    return get_one(common, query)
+    return get_one(common, query, schemas.Subject)
 
 
 def get_subject_books(common: Any, id: str) -> list[schemas.Book]:
@@ -28,5 +28,5 @@ def get_subject_books(common: Any, id: str) -> list[schemas.Book]:
                    ).join(
                        tables.book_subjects,
                        tables.books.c.id == tables.book_subjects.c.book
-                  ).where(tables.book_subjects.c.book == id)
-    return get_all(common, query)
+                  ).where(tables.book_subjects.c.subject == id)
+    return get_all(common, query, schemas.Book)

@@ -16,35 +16,35 @@ authors = Table(
     'authors',
     metadata_obj,
     Column('id', UUID(as_uuid=False), primary_key=True,
-           default=uuid.uuid4),
-    Column('name', String(), nullable=False)
+           default=uuid.uuid4, unique=True),
+    Column('name', String(), nullable=False, unique=True)
 )
 
 awards = Table(
     'awards', metadata_obj,
     Column('id', UUID(as_uuid=False), primary_key=True,
-           default=uuid.uuid4),
-    Column('name', String(), nullable=False)
+           default=uuid.uuid4, unique=True),
+    Column('name', String(), nullable=False, unique=True)
 )
 
 genres = Table(
     'genres', metadata_obj,
     Column('id', UUID(as_uuid=False), primary_key=True,
-           default=uuid.uuid4),
-    Column('name', String(), nullable=False)
+           default=uuid.uuid4, unique=True),
+    Column('name', String(), nullable=False, unique=True)
 )
 
 subjects = Table(
     'subjects', metadata_obj,
     Column('id', UUID(as_uuid=False), primary_key=True,
-           default=uuid.uuid4),
-    Column('name', String(), nullable=False))
+           default=uuid.uuid4, unique=True),
+    Column('name', String(), nullable=False, unique=True))
 
 series = Table(
     'series', metadata_obj,
     Column('id', UUID(as_uuid=False), primary_key=True,
-           default=uuid.uuid4),
-    Column('name', String(), nullable=False)
+           default=uuid.uuid4, unique=True),
+    Column('name', String(), nullable=False, unique=True)
 )
 
 book_authors = Table(
@@ -76,7 +76,7 @@ book_subjects = Table(
            nullable=False))
 
 book_genres = Table(
-    'book_genres', metadata_obj,
+    'book_genre', metadata_obj,
     Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
            nullable=False),
     Column('genre', UUID(as_uuid=False), ForeignKey("genres.id"),
