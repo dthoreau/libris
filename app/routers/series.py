@@ -1,6 +1,6 @@
 import logging
-from typing import Annotated
-from fastapi import APIRouter, Depends
+
+from fastapi import APIRouter
 
 from app import schemas, services
 
@@ -13,24 +13,20 @@ router = APIRouter()
 
 
 @router.get("/series", tags=["Series"])
-def get_all_series(
-    common: Annotated[dict, Depends(deps.common)]) -> \
+def get_all_series(ds: deps.DataSource, slice: deps.Slice) -> \
         list[schemas.Series]:
-    return services.all_series(common)
+    return services.all_series(ds, slice)
 
 
 @router.get("/series/{series}", tags=["Series"])
-def get_series(
-    common: Annotated[dict, Depends(deps.common)], series_id: str) -> \
-        schemas.Series:
-    return services.get_series(common, series_id)
+def get_series(ds: deps.DataSource,  series_id: str) -> schemas.Series:
+    return services.get_series(ds, series_id)
 
 
 @router.get("/series/{series}/books", tags=["Series"])
-def get_series_books(
-    common: Annotated[dict, Depends(deps.common)], series: str) -> \
-        list[schemas.Book]:
-    return services.get_series_books(common, series)
+def get_series_books(ds: deps.DataSource,
+                     series: str) -> list[schemas.Book]:
+    return services.get_series_books(ds, series)
 
 
 @router.get("/series/{series_id}", tags=["Series"])

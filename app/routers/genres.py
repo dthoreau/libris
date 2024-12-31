@@ -1,6 +1,6 @@
 import logging
-from typing import Annotated
-from fastapi import APIRouter, Depends
+
+from fastapi import APIRouter
 
 from app import schemas, services
 from app.util import deps
@@ -12,24 +12,22 @@ router = APIRouter()
 
 
 @router.get("/genres", tags=["Genres"])
-def get_all_genres(
-    common: Annotated[dict, Depends(deps.common)]) \
-        -> list[schemas.Genre]:
-    return services.all_genres(common)
+def get_all_genres(ds: deps.DataSource,
+                   slice: deps.Slice) -> list[schemas.Genre]:
+    return services.all_genres(ds, slice)
 
 
 @router.get("/genres/{genre}", tags=["Genres"])
 def get_genre(
-    common: Annotated[dict, Depends(deps.common)], genre: str) -> \
+    ds: deps.DataSource,  genre: str) -> \
         schemas.Genre:
-    return services.get_genre(common, genre)
+    return services.get_genre(ds, genre)
 
 
 @router.get("/genres/{genre}/books", tags=["Genres"])
-def get_genre_books(
-    common: Annotated[dict, Depends(deps.common)], genre: str) -> \
-        list[schemas.Book]:
-    return services.get_genre_books(common, genre)
+def get_genre_books(ds: deps.DataSource,
+                    genre: str) -> list[schemas.Book]:
+    return services.get_genre_books(ds, genre)
 
 
 @router.get("/genres/{genre_id}", tags=["Genres"])

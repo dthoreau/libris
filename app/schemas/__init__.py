@@ -2,9 +2,9 @@ from .authors import Author, AuthorCreate, AuthorExtended
 from .awards import Award, AwardCreate, AwardExtended
 from .books import (
     Book, BookCreate, BookDetail, BookPatchOptional,  BookExtended)
-from .genres import Genre
-from .series import Series
-from .subjects import Subject
+from .genres import Genre, GenreCreate, GenreExtended
+from .series import Series, SeriesCreate, SeriesExtended
+from .subjects import Subject, SubjectCreate, SubjectExtended
 
 
 __all__ = [
@@ -19,8 +19,14 @@ __all__ = [
     'BookExtended',
 
     'Genre',
+    'GenreCreate',
+    'GenreExtended',
 
     'Series',
+    'SeriesCreate',
+    'SeriesExtended',
 
     'Subject',
+    'SubjectCreate',
+    'SubjectExtended',
 ]
