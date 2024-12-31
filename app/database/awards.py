@@ -11,12 +11,12 @@ import logging
 logger = logging.getLogger()
 
 
-def get_award_books(ds: Any, award_id: str) -> list[schemas.Book]:
+def get_award_books(ds, slice, award_id: str) -> list[schemas.Book]:
     stmt = Select(tables.books.c.id, tables.books.c.title).\
         join(tables.book_awards, tables.books.c.id ==
              tables.book_awards.c.book).\
         where(tables.book_awards.c.award == award_id)
-    return get_all(ds, stmt, schemas.Book)
+    return get_all(ds, stmt, schemas.Book, slice)
 
 
 def get_all_awards(ds, slice) -> list[schemas.Award]:

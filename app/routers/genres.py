@@ -25,9 +25,9 @@ def get_genre(
 
 
 @router.get("/genres/{genre}/books", tags=["Genres"])
-def get_genre_books(ds: deps.DataSource,
+def get_genre_books(ds: deps.DataSource, slice: deps.Slice,
                     genre: str) -> list[schemas.Book]:
-    return services.get_genre_books(ds, genre)
+    return services.get_genre_books(ds, slice, genre)
 
 
 @router.get("/genres/{genre_id}", tags=["Genres"])

@@ -18,14 +18,14 @@ def get_all_genres(ds, slice) -> list[schemas.Genre]:
     )
 
 
-def get_genre_books(ds: Any, id: str) -> list[schemas.Book]:
+def get_genre_books(ds, slice, id: str) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_genres,
                        tables.books.c.id == tables.book_genres.c.book
                   ).where(tables.book_genres.c.genre == id)
-    return get_all(ds, query, schemas.Book)
+    return get_all(ds, query, schemas.Book, slice)
 
 
 def get_genre_by_id(ds: Any, id: str) -> list[schemas.Genre]:
@@ -33,7 +33,7 @@ def get_genre_by_id(ds: Any, id: str) -> list[schemas.Genre]:
         tables.genres.c.id, tables.genres.c.name).where(
             tables.genres.c.id == id)
 
-    return (ds, query, schemas.Genre)
+    return get_one(ds, query, schemas.Genre)
 
 
 def add_genre(ds: Any,

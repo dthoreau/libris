@@ -18,8 +18,9 @@ def get_all_awards(ds: deps.DataSource, slice: deps.Slice
 
 
 @router.get("/awards/{award}", tags=["Awards"])
-def get_award(ds: deps.DataSource, award: str) -> schemas.Award:
-    return services.get_award(ds, award)
+def get_award(ds: deps.DataSource, slice: deps.Slice,
+              award: str) -> schemas.Award:
+    return services.get_award(ds, slice, award)
 
 
 @router.get("/awards/{award}/books", tags=["Awards"])

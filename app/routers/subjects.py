@@ -22,9 +22,9 @@ def get_subject(ds: deps.DataSource, subject: str) -> schemas.Subject:
 
 
 @router.get("/subjects/{subject}/books", tags=["Subjec.ts"])
-def get_subject_books(ds: deps.DataSource,
+def get_subject_books(ds: deps.DataSource, slice: deps.Slice,
                       subject: str) -> list[schemas.Book]:
-    return services.get_subject_books(ds, subject)
+    return services.get_subject_books(ds, slice, subject)
 
 
 @router.get("/subjects/{subject_id}", tags=["Subjec.ts"])

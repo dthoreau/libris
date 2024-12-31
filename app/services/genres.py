@@ -13,8 +13,8 @@ def get_genre(ds, id: str) -> schemas.Genre:
     return database.get_genre_by_id(ds, id)
 
 
-def get_genre_books(ds, id: str) -> list[schemas.Book]:
-    return database.get_genre_books(ds, id)
+def get_genre_books(ds, slice, id: str) -> list[schemas.Book]:
+    return database.get_genre_books(ds, slice, id)
 
 
 def find_genre(ds, name: str) -> schemas.Genre:

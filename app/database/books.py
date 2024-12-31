@@ -8,12 +8,12 @@ import logging
 logger = logging.getLogger()
 
 
-def get_all_books(common: Any) -> list[schemas.Book]:
+def get_all_books(ds, slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id, tables.books.c.title)
-    return get_all(common, query, schemas.Book)
+    return get_all(ds, query, schemas.Book, slice)
 
 
-def get_book_by_id(common: Any, book_id: str) -> schemas.BookDetail:
+def get_book_by_id(ds: Any, book_id: str) -> schemas.BookDetail:
     query = Select(
         tables.books.c.id,
         tables.books.c.title,
@@ -31,4 +31,4 @@ def get_book_by_id(common: Any, book_id: str) -> schemas.BookDetail:
         tables.books.c.publication,
         tables.books.c.publication_date,
     ).where(tables.books.c.id == book_id)
-    return get_one(common, query, schemas.Book)
+    return get_one(ds, query, schemas.Book)
