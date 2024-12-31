@@ -40,7 +40,7 @@ __all__ = ['make_postgres_connection', 'init',
            'get_all_books',
 
            # ----- database routines
-           'get_one', 'get_all',
+           'get_one', 'get_all', 'insert',
 
            # ----- table names
            'book_authors', 'book_awards', 'books', 'authors', 'awards',

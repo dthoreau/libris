@@ -32,7 +32,7 @@ def delete_author():
 
 
 @router.post("/authors", tags=["Authors"])
-def create_author(common: Annotated[dict, Depends(deps.common)], 
+def create_author(common: Annotated[dict, Depends(deps.common)],
                   author: schemas.AuthorCreate):
 
     return services.add_author(common, author)

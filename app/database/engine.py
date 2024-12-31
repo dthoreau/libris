@@ -41,10 +41,11 @@ def get_one(common: dict[str, Any],
         for row in dbh.execute(query):
             return model_type.model_validate(row._asdict())
 
+
 def insert(common: dict[str, Any],
            table: Table, new_record: BaseModel) -> None:
     stmt = Insert(table).values(new_record.model_dump())
     eng: Engine = common["eng"]
     with eng.connect() as dbh:
-        dbh.execute(stmt)  
-        dbh.commit()      
+        dbh.execute(stmt)
+        dbh.commit()

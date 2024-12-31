@@ -31,11 +31,12 @@ def get_author_books(common, id: str) -> list[schemas.Book]:
                   ).where(tables.book_authors.c.author == id)
     return get_all(common, query, schemas.Book)
 
-def add_author(common, 
+
+def add_author(common,
                new_author: schemas.AuthorCreate) -> schemas.Author:
     insert(common, tables.authors, new_author)
     return find_author_by_name(common, new_author.name)
-    
+
 
 def find_author_by_name(common, name: str) -> schemas.Author:
     query = Select(tables.authors.c.id, tables.authors.c.name
