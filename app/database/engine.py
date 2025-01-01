@@ -54,10 +54,9 @@ class DataReader(DataBase):
             with self.engine.connect() as dbh:
                 for row in dbh.execute(query):
                     payload = model_type.model_validate(row._asdict())
+                    return payload
         except Exception as e:
             raise e
-
-        return payload
 
 
 class DataWriter(DataBase):
@@ -76,3 +75,6 @@ class DataWriter(DataBase):
         with self.engine.connect() as dbh:
             dbh.execute(stmt)
             dbh.commit()
+
+    def __del__(self):
+        pass
