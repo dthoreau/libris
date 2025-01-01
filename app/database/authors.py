@@ -1,44 +1,53 @@
 from sqlalchemy import Select
-from typing import Any
 
-from . import get_all, get_one, insert
+import logging
 
 from app import schemas
-from app.database import tables
+from app.database import tables, DataBase
+
+log = logging.getLogger('api')
 
 
-def get_all_authors(ds, slice) -> list[schemas.Author]:
+def get_all_authors(ds: DataBase, slice) -> list[schemas.Author]:
 
     stmt = Select(tables.authors.c.id, tables.authors.c.name)
-    return get_all(ds, stmt, schemas.Author, slice)
+    return ds.reader().get_all(stmt, schemas.Author, slice)
 
 
-def get_author_by_id(ds: Any, id: str) -> schemas.Author:
+def get_author_by_id(ds: DataBase, id: str, slice) -> schemas.AuthorExtended:
     query = Select(
         tables.authors.c.id,
         tables.authors.c.name).where(
-            tables.authors.id == id)
+            tables.authors.c.id == id)
 
-    return get_one(ds, query, schemas.Author)
+    author = ds.reader().get_one(query, schemas.AuthorExtended)
+
+    author.books = get_author_books(ds, id, slice)
+
+    return author
 
 
-def get_author_books(ds, id: str) -> list[schemas.Book]:
+def get_author_books(ds: DataBase, id: str, slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_authors,
                        tables.books.c.id == tables.book_authors.c.book
                   ).where(tables.book_authors.c.author == id)
-    return get_all(ds, query, schemas.Book)
+    return ds.reader().get_all(query, schemas.Book, slice)
 
 
-def add_author(ds,
+def add_author(ds: DataBase,
                new_author: schemas.AuthorCreate) -> schemas.Author:
-    insert(ds, tables.authors, new_author)
+    ds.writer().insert(tables.authors, new_author)
     return find_author_by_name(ds, new_author.name)
 
 
-def find_author_by_name(ds, name: str) -> schemas.Author:
+def find_author_by_name(ds: DataBase, name: str) -> schemas.Author:
     query = Select(tables.authors.c.id, tables.authors.c.name
                    ).where(tables.authors.c.name == name)
-    return get_one(ds, query, schemas.Author)
+    return ds.reader().get_one(query, schemas.Author)
+
+
+def delete_author(ds: DataBase, author_id: int) -> None:
+    ds.writer().delete(tables.authors, author_id)

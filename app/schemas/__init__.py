@@ -1,4 +1,4 @@
-from .authors import Author, AuthorCreate, AuthorExtended
+from .authors import Author, AuthorCreate, AuthorExtended, AuthorBook
 from .awards import Award, AwardCreate, AwardExtended
 from .books import (
     Book, BookCreate, BookDetail, BookPatchOptional,  BookExtended)
@@ -8,7 +8,7 @@ from .subjects import Subject, SubjectCreate, SubjectExtended
 
 
 __all__ = [
-    'Author', 'AuthorCreate', 'AuthorExtended',
+    'Author', 'AuthorCreate', 'AuthorExtended', 'AuthorBook',
 
     'Award', 'AwardCreate', 'AwardExtended',
 

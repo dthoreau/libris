@@ -1,19 +1,18 @@
-from typing import Any
 from sqlalchemy import Select
 
-from app.database import get_one, get_all, tables
+from app.database import tables, DataBase
 from app import schemas
 
 import logging
 logger = logging.getLogger()
 
 
-def get_all_books(ds, slice) -> list[schemas.Book]:
+def get_all_books(ds: DataBase, slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id, tables.books.c.title)
-    return get_all(ds, query, schemas.Book, slice)
+    return ds.reader().get_all(query, schemas.Book, slice)
 
 
-def get_book_by_id(ds: Any, book_id: str) -> schemas.BookDetail:
+def get_book_by_id(ds: DataBase, book_id: str) -> schemas.BookDetail:
     query = Select(
         tables.books.c.id,
         tables.books.c.title,
@@ -31,4 +30,4 @@ def get_book_by_id(ds: Any, book_id: str) -> schemas.BookDetail:
         tables.books.c.publication,
         tables.books.c.publication_date,
     ).where(tables.books.c.id == book_id)
-    return get_one(ds, query, schemas.Book)
+    return ds.reader().get_one(query, schemas.Book)
