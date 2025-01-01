@@ -8,7 +8,7 @@ logger = logging.getLogger()
 
 
 def get_all_genres(ds: DataBase, slice) -> list[schemas.Genre]:
-    return ds.get_all(
+    return ds.reader().get_all(
         Select(tables.genres.c.id, tables.genres.c.name),
         schemas.Genre,
         slice
@@ -23,7 +23,7 @@ def get_genre_books(ds: DataBase,
                        tables.book_genres,
                        tables.books.c.id == tables.book_genres.c.book
                   ).where(tables.book_genres.c.genre == id)
-    return ds.get_all(query, schemas.Book, slice)
+    return ds.reader().get_all(query, schemas.Book, slice)
 
 
 def get_genre_by_id(ds: DataBase, id: str) -> list[schemas.Genre]:
@@ -31,16 +31,16 @@ def get_genre_by_id(ds: DataBase, id: str) -> list[schemas.Genre]:
         tables.genres.c.id, tables.genres.c.name).where(
             tables.genres.c.id == id)
 
-    return ds.get_one(query, schemas.Genre)
+    return ds.reader().get_one(query, schemas.Genre)
 
 
 def add_genre(ds: DataBase,
               new_genre: schemas.GenreCreate) -> schemas.Genre:
-    ds.insert(tables.genres, new_genre)
+    ds.writer().insert(tables.genres, new_genre)
     return find_genre_by_name(ds, new_genre.name)
 
 
 def find_genre_by_name(ds: DataBase, name: str) -> schemas.Genre:
     query = Select(tables.genres.c.id, tables.genres.c.name
                    ).where(tables.genres.c.name == name)
-    return ds.get_one(query, schemas.Genre)
+    return ds.reader().get_one(query, schemas.Genre)

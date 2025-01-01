@@ -8,7 +8,7 @@ logger = logging.getLogger()
 
 
 def get_all_subjects(ds: DataBase, slice) -> list[schemas.Subject]:
-    return ds.get_all(
+    return ds.reader().get_all(
         Select(tables.subjects.c.id, tables.subjects.c.name),
         schemas.Subject, slice=slice)
 
@@ -17,7 +17,7 @@ def get_subject_by_id(ds: DataBase, id: str) -> schemas.Subject:
     query = Select(tables.subjects.c.id, tables.subjects.c.name).where(
         tables.subjects.c.id == id)
 
-    return ds.get_one(query, schemas.Subject)
+    return ds.reader().get_one(query, schemas.Subject)
 
 
 def get_subject_books(ds: DataBase,
@@ -28,16 +28,16 @@ def get_subject_books(ds: DataBase,
                        tables.book_subjects,
                        tables.books.c.id == tables.book_subjects.c.book
                   ).where(tables.book_subjects.c.subject == id)
-    return ds.get_all(query, schemas.Book, slice)
+    return ds.reader().get_all(query, schemas.Book, slice)
 
 
 def add_subject(ds: DataBase,
                 new_subject: schemas.SubjectCreate) -> schemas.Subject:
-    ds.insert(tables.subjects, new_subject)
+    ds.writer().insert(tables.subjects, new_subject)
     return find_subject_by_name(new_subject.name)
 
 
 def find_subject_by_name(ds: DataBase, name: str) -> schemas.Subject:
     query = Select(tables.subjects.c.id, tables.subjects.c.name
                    ).where(tables.subjects.c.name == name)
-    return ds.get_one(query, schemas.Subject)
+    return ds.reader().get_one(query, schemas.Subject)

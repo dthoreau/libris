@@ -40,8 +40,9 @@ def delete_award():
 
 
 @router.post("/awards", tags=["Awards"])
-def create_award():
-    return NotImplementedError
+def create_award(ds: deps.DataSource,
+                 award: schemas.AwardCreate) -> schemas.Award:
+    return services.add_award(ds, award)
 
 
 @router.put("/awards/{award_id}", tags=["Awards"])

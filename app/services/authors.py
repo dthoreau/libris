@@ -14,6 +14,7 @@ def get_author(datasource, slice, id: str) -> schemas.Author:
 
 def add_author(datasource,
                new_author: schemas.AuthorCreate) -> None:
+    log.info(new_author)
     return database.add_author(datasource, new_author)
 
 
