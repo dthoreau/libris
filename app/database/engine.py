@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Engine
 from typing import Type, TypeVar
 from pydantic import BaseModel
 
-from sqlalchemy import Select, Insert, Table
+from sqlalchemy import Select, Insert, Table, Delete
 
 import logging
 logger = logging.getLogger()
@@ -34,12 +34,12 @@ class DataReader(DataBase):
     def get_all(self,
                 query: Select,
                 model_type: Type[ModelType],
-                slice: dict[str, int]) -> list[ModelType]:
+                slice: object) -> list[ModelType]:
         collection: list[ModelType] = []
 
         with self.engine.connect() as dbh:
 
-            query = query.limit(slice["limit"]).offset(slice["skip"])
+            query = query.limit(slice.limit).offset(slice.skip)
             for row in dbh.execute(query):
                 temp = model_type.model_validate(row._asdict())
                 collection.append(temp)
@@ -50,9 +50,14 @@ class DataReader(DataBase):
                 query: Select,
                 model_type: Type[ModelType]) -> ModelType:
 
-        with self.engine.connect() as dbh:
-            for row in dbh.execute(query):
-                return model_type.model_validate(row._asdict())
+        try:
+            with self.engine.connect() as dbh:
+                for row in dbh.execute(query):
+                    payload = model_type.model_validate(row._asdict())
+        except Exception as e:
+            raise e
+
+        return payload
 
 
 class DataWriter(DataBase):
@@ -66,6 +71,8 @@ class DataWriter(DataBase):
             dbh.execute(stmt)
             dbh.commit()
 
-    def __del__(self):
+    def delete(self, table: Table, id: str) -> None:
+        stmt = Delete(table).where(table.c.id == id)
         with self.engine.connect() as dbh:
+            dbh.execute(stmt)
             dbh.commit()

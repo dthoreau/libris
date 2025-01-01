@@ -14,13 +14,13 @@ def get_all_series(ds: DataBase, slice) -> list[schemas.Series]:
         slice)
 
 
-def get_series_books(ds: DataBase, slice) -> list[schemas.Book]:
+def get_series_books(ds: DataBase, series, slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_series,
                        tables.books.c.id == tables.book_series.c.book
-                  ).where(tables.book_series.c.series == id)
+                  ).where(tables.book_series.c.series == series)
     return ds.reader().get_all(query, schemas.Book, slice)
 
 

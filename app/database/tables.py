@@ -48,7 +48,7 @@ series = Table(
 )
 
 book_authors = Table(
-    'book_authors', metadata_obj,
+    'authorship', metadata_obj,
     Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
            nullable=False),
     Column('author', UUID(as_uuid=False), ForeignKey("authors.id"),
@@ -65,11 +65,11 @@ book_series = Table(
     'book_series', metadata_obj,
     Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
            nullable=False),
-    Column('serues', UUID(as_uuid=False), ForeignKey("series.id"),
+    Column('series', UUID(as_uuid=False), ForeignKey("series.id"),
            nullable=False))
 
 book_subjects = Table(
-    'book_subject', metadata_obj,
+    'book_subjects', metadata_obj,
     Column('book', UUID(as_uuid=False), ForeignKey("books.id"),
            nullable=False),
     Column('subject', UUID(as_uuid=False), ForeignKey("subject.id"),

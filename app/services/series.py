@@ -13,8 +13,8 @@ def get_series(ds, id: str) -> schemas.Series:
     return database.get_series_by_id(ds, id)
 
 
-def get_series_books(ds, slice, id: str) -> list[schemas.Book]:
-    return database.get_series_books(ds, slice, id)
+def get_series_books(ds, series: str, slice) -> list[schemas.Book]:
+    return database.get_series_books(ds, series, slice)
 
 
 def find_series(ds, name: str) -> schemas.Series:

@@ -3,7 +3,7 @@
 PYTHON := $(shell readlink .venv/bin/python3.12)
 
 uvicorn:
-	python -m app
+	uvicorn app.routers:app --reload
 
 tests: pytest mypy flake8
 

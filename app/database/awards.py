@@ -8,7 +8,7 @@ logger = logging.getLogger()
 
 
 def get_award_books(ds: DataBase,
-                    slice, award_id: str) -> list[schemas.Book]:
+                    award_id: str, slice) -> list[schemas.Book]:
     stmt = Select(tables.books.c.id, tables.books.c.title).\
         join(tables.book_awards, tables.books.c.id ==
              tables.book_awards.c.book).\

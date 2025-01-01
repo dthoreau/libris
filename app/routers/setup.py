@@ -2,7 +2,11 @@ import logging
 from fastapi import FastAPI
 
 from app.database import DataBase
+from starlette.requests import Request
+from starlette.responses import Response
 from starlette_admin.contrib.sqla import Admin
+
+from traceback import print_exception
 
 from sqlalchemy import create_engine
 
@@ -23,6 +27,16 @@ app = FastAPI(
     version=libris_version,
     openapi_tags=[]
 )
+
+
+async def catch_exceptions_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as e:
+        print_exception(e)
+        return Response('Internal Server Error', status_code=500)
+
+app.middleware('http')(catch_exceptions_middleware)
 
 ds = DataBase()
 engine = create_engine(

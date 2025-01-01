@@ -21,7 +21,7 @@ def get_subject_by_id(ds: DataBase, id: str) -> schemas.Subject:
 
 
 def get_subject_books(ds: DataBase,
-                      slice, id: str) -> list[schemas.Book]:
+                      id: str, slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(

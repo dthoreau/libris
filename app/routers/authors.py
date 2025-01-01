@@ -18,14 +18,14 @@ def get_all_authors(ds: deps.DataSource,
 
 @router.get("/authors/{author_id}", tags=["Authors"])
 def get_author_by_id(ds: deps.DataSource, slice: deps.Slice,
-                     id: str) -> list[schemas.Author]:
+                     id: str) -> schemas.AuthorExtended:
 
-    return services.get_author(ds, slice, id)
+    return services.get_author(ds, id, slice)
 
 
 @router.delete("/authors/{author_id}", tags=["Authors"])
-def delete_author():
-    return NotImplementedError
+def delete_author(ds: deps.DataSource, id: str):
+    services.delete_author(ds, id)
 
 
 @router.post("/authors", tags=["Authors"])
@@ -38,3 +38,9 @@ def create_author(ds: deps.DataSource,
 @router.put("/authors/{author_id}", tags=["Authors"])
 def update_author():
     return NotImplementedError
+
+
+@router.get("/authors/{author_id}/books", tags=["Authors"])
+def get_author_books(ds: deps.DataSource, id: str,
+                     slice: deps.Slice) -> list[schemas.AuthorBook]:
+    return services.get_author_books(ds, id, slice)

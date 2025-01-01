@@ -13,8 +13,8 @@ def get_subject(ds, id: str) -> schemas.Subject:
     return database.get_subject_by_id(ds, id)
 
 
-def get_subject_books(ds, id: str) -> list[schemas.Book]:
-    return database.get_subject_books(ds, id)
+def get_subject_books(ds, id: str, slice) -> list[schemas.Book]:
+    return database.get_subject_books(ds, id, slice)
 
 
 def find_subject(ds, name: str) -> schemas.Subject:
