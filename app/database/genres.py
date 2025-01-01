@@ -1,48 +1,46 @@
-from typing import Any
-
 from sqlalchemy import Select
 
-from app.database import get_all, tables, get_one, insert
+from app.database import tables, DataBase
 from app import schemas
 
 import logging
 logger = logging.getLogger()
 
 
-def get_all_genres(ds, slice) -> list[schemas.Genre]:
-    return get_all(
-        ds,
+def get_all_genres(ds: DataBase, slice) -> list[schemas.Genre]:
+    return ds.get_all(
         Select(tables.genres.c.id, tables.genres.c.name),
         schemas.Genre,
         slice
     )
 
 
-def get_genre_books(ds, slice, id: str) -> list[schemas.Book]:
+def get_genre_books(ds: DataBase,
+                    slice, id: str) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_genres,
                        tables.books.c.id == tables.book_genres.c.book
                   ).where(tables.book_genres.c.genre == id)
-    return get_all(ds, query, schemas.Book, slice)
+    return ds.get_all(query, schemas.Book, slice)
 
 
-def get_genre_by_id(ds: Any, id: str) -> list[schemas.Genre]:
+def get_genre_by_id(ds: DataBase, id: str) -> list[schemas.Genre]:
     query = Select(
         tables.genres.c.id, tables.genres.c.name).where(
             tables.genres.c.id == id)
 
-    return get_one(ds, query, schemas.Genre)
+    return ds.get_one(query, schemas.Genre)
 
 
-def add_genre(ds: Any,
+def add_genre(ds: DataBase,
               new_genre: schemas.GenreCreate) -> schemas.Genre:
-    insert(ds, tables.genres, new_genre)
+    ds.insert(tables.genres, new_genre)
     return find_genre_by_name(ds, new_genre.name)
 
 
-def find_genre_by_name(ds: Any, name: str) -> schemas.Genre:
+def find_genre_by_name(ds: DataBase, name: str) -> schemas.Genre:
     query = Select(tables.genres.c.id, tables.genres.c.name
                    ).where(tables.genres.c.name == name)
-    return get_one(ds, query, schemas.Genre)
+    return ds.get_one(query, schemas.Genre)

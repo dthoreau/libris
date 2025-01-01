@@ -1,8 +1,10 @@
 import logging
 from fastapi import FastAPI
 
-from app.database import make_postgres_connection
+from app.database import DataBase
 from starlette_admin.contrib.sqla import Admin
+
+from sqlalchemy import create_engine
 
 from .admin import setup_admin
 
@@ -21,8 +23,12 @@ app = FastAPI(
     version=libris_version,
     openapi_tags=[]
 )
-engine = make_postgres_connection()
-admin = Admin(engine, 'Libris')
+
+ds = DataBase()
+engine = create_engine(
+            "postgresql+psycopg2://libris@localhost/libris",
+            echo=True)
+admin = Admin(ds.engine, 'Libris')
 
 setup_admin(admin)
 

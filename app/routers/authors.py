@@ -13,6 +13,7 @@ router = APIRouter()
 @router.get("/authors", tags=["Authors"])
 def get_all_authors(ds: deps.DataSource,
                     slice: deps.Slice) -> list[schemas.Author]:
+
     return services.all_authors(ds, slice)
 
 
