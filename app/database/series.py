@@ -35,7 +35,8 @@ def get_series_by_id(ds: DataBase, id: str) -> schemas.Series:
 
 def add_series(ds: DataBase,
                new_series: schemas.SeriesCreate) -> schemas.Series:
-    ds.writer().insert(tables.series, new_series)
+    with ds.writer() as dw:
+        dw.insert(tables.series, new_series)
     return find_series_by_name(new_series.name)
 
 

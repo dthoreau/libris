@@ -29,7 +29,7 @@ def test_authors():
 
     retrieved = services.find_author(ds, test_author)
     assert author.id == retrieved.id
-    
+
     books = services.get_author_books(ds, author.id, slice)
     assert len(books) == 0
 

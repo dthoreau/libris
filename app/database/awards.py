@@ -30,7 +30,8 @@ def get_award_by_id(ds: DataBase, award_id: str) -> schemas.Award:
 
 def add_award(ds: DataBase,
               new_award: schemas.AwardCreate) -> schemas.Award:
-    ds.writer().insert(tables.awards, new_award)
+    with ds.writer() as dw:
+        dw.insert(tables.awards, new_award)
     return find_award_by_name(ds, new_award.name)
 
 

@@ -33,7 +33,8 @@ def get_subject_books(ds: DataBase,
 
 def add_subject(ds: DataBase,
                 new_subject: schemas.SubjectCreate) -> schemas.Subject:
-    ds.writer().insert(tables.subjects, new_subject)
+    with ds.writer() as dw:
+        dw.insert(tables.subjects, new_subject)
     return find_subject_by_name(new_subject.name)
 
 
