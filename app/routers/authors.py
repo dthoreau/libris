@@ -12,15 +12,15 @@ router = APIRouter()
 
 @router.get("/authors", tags=["Authors"])
 def get_all_authors(ds: deps.DataSource,
-                    slice: deps.Slice) -> list[schemas.Author]:
-    return services.all_authors(ds, slice)
+                    qslice: deps.Slice) -> list[schemas.Author]:
+    return services.all_authors(ds, qslice)
 
 
 @router.get("/authors/{author_id}", tags=["Authors"])
-def get_author_by_id(ds: deps.DataSource, slice: deps.Slice,
+def get_author_by_id(ds: deps.DataSource, qslice: deps.Slice,
                      id: str) -> schemas.AuthorExtended:
 
-    return services.get_author(ds, id, slice)
+    return services.get_author(ds, id, qslice)
 
 
 @router.delete("/authors/{author_id}", tags=["Authors"])
@@ -42,5 +42,5 @@ def update_author():
 
 @router.get("/authors/{author_id}/books", tags=["Authors"])
 def get_author_books(ds: deps.DataSource, id: str,
-                     slice: deps.Slice) -> list[schemas.AuthorBook]:
-    return services.get_author_books(ds, id, slice)
+                     qslice: deps.Slice) -> list[schemas.AuthorBook]:
+    return services.get_author_books(ds, id, qslice)

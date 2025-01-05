@@ -13,8 +13,8 @@ router = APIRouter()
 
 @router.get("/genres", tags=["Genres"])
 def get_all_genres(ds: deps.DataSource,
-                   slice: deps.Slice) -> list[schemas.Genre]:
-    return services.all_genres(ds, slice)
+                   qslice: deps.Slice) -> list[schemas.Genre]:
+    return services.all_genres(ds, qslice)
 
 
 @router.get("/genres/{genre}", tags=["Genres"])
@@ -25,9 +25,9 @@ def get_genre(
 
 
 @router.get("/genres/{genre}/books", tags=["Genres"])
-def get_genre_books(ds: deps.DataSource, slice: deps.Slice,
+def get_genre_books(ds: deps.DataSource, qslice: deps.Slice,
                     genre: str) -> list[schemas.Book]:
-    return services.get_genre_books(ds, slice, genre)
+    return services.get_genre_books(ds, qslice, genre)
 
 
 @router.get("/genres/{genre_id}", tags=["Genres"])

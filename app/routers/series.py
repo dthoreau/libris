@@ -13,9 +13,9 @@ router = APIRouter()
 
 
 @router.get("/series", tags=["Series"])
-def get_all_series(ds: deps.DataSource, slice: deps.Slice) -> \
+def get_all_series(ds: deps.DataSource, qslice: deps.Slice) -> \
         list[schemas.Series]:
-    return services.all_series(ds, slice)
+    return services.all_series(ds, qslice)
 
 
 @router.get("/series/{series}", tags=["Series"])
@@ -24,9 +24,9 @@ def get_series(ds: deps.DataSource,  series_id: str) -> schemas.Series:
 
 
 @router.get("/series/{series}/books", tags=["Series"])
-def get_series_books(ds: deps.DataSource, slice: deps.Slice,
+def get_series_books(ds: deps.DataSource, qslice: deps.Slice,
                      series: str) -> list[schemas.Book]:
-    return services.get_series_books(ds, series, slice)
+    return services.get_series_books(ds, series, qslice)
 
 
 @router.get("/series/{series_id}", tags=["Series"])

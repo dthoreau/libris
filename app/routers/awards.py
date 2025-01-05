@@ -12,21 +12,21 @@ router = APIRouter()
 
 
 @router.get("/awards", tags=["Awards"])
-def get_all_awards(ds: deps.DataSource, slice: deps.Slice
+def get_all_awards(ds: deps.DataSource, qslice: deps.Slice
                    ) -> list[schemas.Award]:
-    return services.all_awards(ds, slice)
+    return services.all_awards(ds, qslice)
 
 
 @router.get("/awards/{award}", tags=["Awards"])
-def get_award(ds: deps.DataSource, slice: deps.Slice,
+def get_award(ds: deps.DataSource, qslice: deps.Slice,
               award: str) -> schemas.Award:
-    return services.get_award(ds, award, slice)
+    return services.get_award(ds, award, qslice)
 
 
 @router.get("/awards/{award}/books", tags=["Awards"])
-def get_award_books(ds: deps.DataSource, slice: deps.Slice,
+def get_award_books(ds: deps.DataSource, qslice: deps.Slice,
                     award: str) -> list[schemas.Book]:
-    return services.get_award_books(ds, award, slice)
+    return services.get_award_books(ds, award, qslice)
 
 
 @router.get("/awards/{award_id}", tags=["Awards"])

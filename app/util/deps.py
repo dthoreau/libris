@@ -18,12 +18,12 @@ class QuerySlice(object):
         self.limit = limit
 
 
-async def slice(skip: int = 0, limit: int = 100):
+async def querySlice(skip: int = 0, limit: int = 100):
     return QuerySlice(skip, limit)
 
 
 async def database():
     return DataBase()
 
-Slice = Annotated[dict, Depends(slice)]
+Slice = Annotated[dict, Depends(querySlice)]
 DataSource = Annotated[dict, Depends(database)]

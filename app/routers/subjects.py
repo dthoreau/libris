@@ -12,8 +12,8 @@ router = APIRouter()
 
 @router.get("/subjects", tags=["Subjec.ts"])
 def get_all_subjects(ds: deps.DataSource,
-                     slice: deps.Slice) -> list[schemas.Subject]:
-    return services.all_subjects(ds, slice)
+                     qslice: deps.Slice) -> list[schemas.Subject]:
+    return services.all_subjects(ds, qslice)
 
 
 @router.get("/subjects/{subject}", tags=["Subjec.ts"])
@@ -22,9 +22,9 @@ def get_subject(ds: deps.DataSource, subject: str) -> schemas.Subject:
 
 
 @router.get("/subjects/{subject}/books", tags=["Subjec.ts"])
-def get_subject_books(ds: deps.DataSource, slice: deps.Slice,
+def get_subject_books(ds: deps.DataSource, qslice: deps.Slice,
                       subject: str) -> list[schemas.Book]:
-    return services.get_subject_books(ds, subject, slice)
+    return services.get_subject_books(ds, subject, qslice)
 
 
 @router.get("/subjects/{subject_id}", tags=["Subjec.ts"])
