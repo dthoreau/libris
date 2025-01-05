@@ -39,8 +39,9 @@ def get_author_books(ds: DataBase, id: str, slice) -> list[schemas.Book]:
 
 def add_author(ds: DataBase,
                new_author: schemas.AuthorCreate) -> schemas.Author:
-    ds.writer().insert(tables.authors, new_author)
-    return find_author_by_name(ds, new_author.name)
+    with ds.writer() as dw:
+        dw.insert(tables.authors, new_author)
+    return find_author_by_name(ds.reader(), new_author.name)
 
 
 def find_author_by_name(ds: DataBase, name: str) -> schemas.Author:

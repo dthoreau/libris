@@ -36,7 +36,8 @@ def get_genre_by_id(ds: DataBase, id: str) -> list[schemas.Genre]:
 
 def add_genre(ds: DataBase,
               new_genre: schemas.GenreCreate) -> schemas.Genre:
-    ds.writer().insert(tables.genres, new_genre)
+    with ds.writer() as dw:
+        dw.insert(tables.genres, new_genre)
     return find_genre_by_name(ds, new_genre.name)
 
 

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Engine
+from sqlalchemy import create_engine, Engine, Connection
 from typing import Type, TypeVar
 from pydantic import BaseModel
 
@@ -12,11 +12,14 @@ ModelType = TypeVar('ModelType', bound=BaseModel)
 
 class DataBase(object):
     engine: Engine
+    dbh: Connection
 
     def __init__(self) -> None:
         self.engine = create_engine(
             "postgresql+psycopg2://libris@localhost/libris",
             echo=True)
+
+        self.dbh = self.engine.connect()
 
     def get_engine(self) -> Engine:
         return self.engine
@@ -37,12 +40,10 @@ class DataReader(DataBase):
                 slice: object) -> list[ModelType]:
         collection: list[ModelType] = []
 
-        with self.engine.connect() as dbh:
-
-            query = query.limit(slice.limit).offset(slice.skip)
-            for row in dbh.execute(query):
-                temp = model_type.model_validate(row._asdict())
-                collection.append(temp)
+        query = query.limit(slice.limit).offset(slice.skip)
+        for row in self.dbh.execute(query):
+            temp = model_type.model_validate(row._asdict())
+            collection.append(temp)
 
         return collection
 
@@ -62,19 +63,21 @@ class DataReader(DataBase):
 class DataWriter(DataBase):
     pass
 
+    def __enter__(self):
+        self.dbh = self.engine.connect()
+
+        return self
+
     def insert(self, table: Table, new_record: BaseModel) -> None:
         stmt = Insert(table).values(
             new_record.model_dump())  # type: ignore[misc]
-        engine: Engine = self.engine
-        with engine.connect() as dbh:
-            dbh.execute(stmt)
-            dbh.commit()
+
+        self.dbh.execute(stmt)
 
     def delete(self, table: Table, id: str) -> None:
         stmt = Delete(table).where(table.c.id == id)
-        with self.engine.connect() as dbh:
-            dbh.execute(stmt)
-            dbh.commit()
 
-    def __del__(self):
-        pass
+        self.dbh.execute(stmt)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.dbh.commit()
