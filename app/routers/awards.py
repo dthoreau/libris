@@ -19,7 +19,7 @@ def get_all_awards(ds: deps.DataSource, qslice: deps.Slice
 
 @router.get("/awards/{award}", tags=["Awards"])
 def get_award(ds: deps.DataSource, qslice: deps.Slice,
-              award: str) -> schemas.Award:
+              award: str) -> schemas.AwardExtended:
     return services.get_award(ds, award, qslice)
 
 
@@ -27,11 +27,6 @@ def get_award(ds: deps.DataSource, qslice: deps.Slice,
 def get_award_books(ds: deps.DataSource, qslice: deps.Slice,
                     award: str) -> list[schemas.Book]:
     return services.get_award_books(ds, award, qslice)
-
-
-@router.get("/awards/{award_id}", tags=["Awards"])
-def get_award_by_id():
-    return NotImplementedError
 
 
 @router.delete("/awards/{award_id}", tags=["Awards"])

@@ -9,6 +9,8 @@ our @EXPORT_OK = qw{get_awards_hash maybe_add_award};
 
 use Util qw{get_hashval get_hashvals};
 
+use Data::Dumper;
+
 sub get_awards_hash {
     my ($db) = @_;
 
@@ -16,8 +18,8 @@ sub get_awards_hash {
     my $db_awards = $db->match_many(['awards.id', 'name'],[],{});
 
     foreach my $db_a (@$db_awards) {
-	my ($id, $name) = get_hashvals($db_a,[qw(id name)]);
-	$return_hash->{$name}=$id;
+        my ($id, $name) = get_hashvals($db_a,[qw(id name)]);
+        $return_hash->{$name}=$id;
     }
 
     return $return_hash;
@@ -29,9 +31,9 @@ sub maybe_add_award ($$;$){
     $lookup //= get_awards_hash($db);
 
     if (not exists $lookup->{$name}) {
-	my $id = $db->insert_entry('awards', {name=>$name});
+        my $id = $db->insert_entry('awards', {name=>$name});
 
-	$lookup->{$name} = $id;
+        $lookup->{$name} = $id;
     }
 
     return $lookup;

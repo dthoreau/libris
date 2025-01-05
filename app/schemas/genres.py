@@ -14,5 +14,10 @@ class Genre(GenreBase):
     id: UUID4
 
 
+class GenreBook(BaseModel):
+    id: UUID4
+    title: str
+
+
 class GenreExtended(Genre):
-    books: Optional[list[UUID4]] = []
+    books: Optional[GenreBook] = []

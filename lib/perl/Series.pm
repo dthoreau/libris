@@ -16,9 +16,9 @@ sub get_series_hash {
     my $db_series = $db->match_many(['series.id', 'name'],[],{});
 
     foreach my $db_a (@$db_series) {
-	my ($id, $name) = get_hashvals($db_a,[qw(id name)]);
-	$return_hash->{$name}=$id;
-    }
+        my ($id, $name) = get_hashvals($db_a,[qw(id name)]);
+            $return_hash->{$name}=$id;
+        }
 
     return $return_hash;
 }
@@ -29,9 +29,9 @@ sub maybe_add_series ($$;$){
     $lookup //= get_series_hash($db);
 
     if (not exists $lookup->{$name}) {
-	my $id = $db->insert_entry('series', {name=>$name});
+        my $id = $db->insert_entry('series', {name=>$name});
 
-	$lookup->{$name} = $id;
+        $lookup->{$name} = $id;
     }
 
     return $lookup;

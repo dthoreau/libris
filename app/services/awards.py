@@ -1,6 +1,7 @@
 import logging
 
 from app import database, schemas
+from app.util import deps
 
 log = logging.getLogger('api')
 
@@ -9,12 +10,12 @@ def all_awards(ds, slice) -> list[schemas.Award]:
     return database.get_all_awards(ds, slice)
 
 
-def get_award_books(ds, award: str, slice) -> list[schemas.Book]:
-    return database.get_award_books(ds, award_id=award, slice=slice)
+def get_award_books(ds, award: str, qslice: deps.Slice) -> list[schemas.Book]:
+    return database.get_award_books(ds, award, qslice)
 
 
-def get_award(ds, award: str, slice) -> schemas.Award:
-    return database.get_award_by_id(ds, award_id=award)
+def get_award(ds, award: str, qslice: deps.Slice) -> schemas.AwardExtended:
+    return database.get_award_by_id(ds, award, qslice)
 
 
 def find_award(ds, name: str) -> schemas.Award:

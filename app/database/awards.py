@@ -2,18 +2,19 @@ from sqlalchemy import Select
 
 from app import schemas
 from app.database import tables, DataBase
+from app.util import deps
 
 import logging
 logger = logging.getLogger()
 
 
 def get_award_books(ds: DataBase,
-                    award_id: str, slice) -> list[schemas.Book]:
+                    award_id: str, qslice) -> list[schemas.Book]:
     stmt = Select(tables.books.c.id, tables.books.c.title).\
         join(tables.book_awards, tables.books.c.id ==
              tables.book_awards.c.book).\
         where(tables.book_awards.c.award == award_id)
-    return ds.reader().get_all(stmt, schemas.Book, slice)
+    return ds.reader().get_all(stmt, schemas.Book, qslice)
 
 
 def get_all_awards(ds: DataBase, slice) -> list[schemas.Award]:
@@ -22,10 +23,14 @@ def get_all_awards(ds: DataBase, slice) -> list[schemas.Award]:
         schemas.Award, slice)
 
 
-def get_award_by_id(ds: DataBase, award_id: str) -> schemas.Award:
+def get_award_by_id(ds: DataBase, award_id: str,
+                    qslice: deps.Slice) -> schemas.AwardExtended:
     stmt = Select(tables.awards.c.id, tables.awards.c.name).\
         where(tables.awards.c.id == award_id)
-    return ds.reader().get_one(stmt, schemas.Award)
+    award = ds.reader().get_one(stmt, schemas.AwardExtended)
+    award.books = get_award_books(ds, award_id, qslice)
+
+    return award
 
 
 def add_award(ds: DataBase,

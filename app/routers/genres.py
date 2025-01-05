@@ -19,20 +19,15 @@ def get_all_genres(ds: deps.DataSource,
 
 @router.get("/genres/{genre}", tags=["Genres"])
 def get_genre(
-    ds: deps.DataSource,  genre: str) -> \
-        schemas.Genre:
-    return services.get_genre(ds, genre)
+    ds: deps.DataSource,  genre: str, qslice: deps.Slice) -> \
+        schemas.GenreExtended:
+    return services.get_genre(ds, genre, qslice)
 
 
 @router.get("/genres/{genre}/books", tags=["Genres"])
 def get_genre_books(ds: deps.DataSource, qslice: deps.Slice,
                     genre: str) -> list[schemas.Book]:
     return services.get_genre_books(ds, qslice, genre)
-
-
-@router.get("/genres/{genre_id}", tags=["Genres"])
-def get_genre_by_id() -> list[schemas.Genre]:
-    return NotImplementedError
 
 
 @router.delete("/genres/{genre_id}", tags=["Genres"])

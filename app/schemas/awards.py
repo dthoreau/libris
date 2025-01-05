@@ -14,5 +14,10 @@ class Award(AwardBase):
     id: UUID4
 
 
+class AwardBook(BaseModel):
+    id: UUID4
+    title: str
+
+
 class AwardExtended(Award):
-    books: Optional[list[UUID4]] = []
+    books: Optional[AwardBook] = []

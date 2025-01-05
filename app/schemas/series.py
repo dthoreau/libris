@@ -14,5 +14,10 @@ class Series(SeriesBase):
     id: UUID4
 
 
+class SeriesBook(BaseModel):
+    id: UUID4
+    title: str
+
+
 class SeriesExtended(Series):
-    books: Optional[list[UUID4]] = []
+    books: Optional[SeriesBook] = []

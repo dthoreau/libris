@@ -19,19 +19,15 @@ def get_all_series(ds: deps.DataSource, qslice: deps.Slice) -> \
 
 
 @router.get("/series/{series}", tags=["Series"])
-def get_series(ds: deps.DataSource,  series_id: str) -> schemas.Series:
-    return services.get_series(ds, series_id)
+def get_series(ds: deps.DataSource, series_id: str,
+               qslice: deps.Slice) -> schemas.Series:
+    return services.get_series(ds, series_id, qslice)
 
 
 @router.get("/series/{series}/books", tags=["Series"])
 def get_series_books(ds: deps.DataSource, qslice: deps.Slice,
                      series: str) -> list[schemas.Book]:
     return services.get_series_books(ds, series, qslice)
-
-
-@router.get("/series/{series_id}", tags=["Series"])
-def get_series_by_id():
-    return NotImplementedError
 
 
 @router.delete("/series/{series_id}", tags=["Series"])

@@ -5,16 +5,16 @@ from app import database, schemas
 log = logging.getLogger('api')
 
 
-def all_series(ds, slice) -> list[schemas.Series]:
-    return database.get_all_series(ds, slice)
+def all_series(ds, qslice) -> list[schemas.Series]:
+    return database.get_all_series(ds, qslice)
 
 
-def get_series(ds, id: str) -> schemas.Series:
-    return database.get_series_by_id(ds, id)
+def get_series(ds, id: str, qslice) -> schemas.Series:
+    return database.get_series_by_id(ds, id, qslice)
 
 
-def get_series_books(ds, series: str, slice) -> list[schemas.Book]:
-    return database.get_series_books(ds, series, slice)
+def get_series_books(ds, series: str, qslice) -> list[schemas.Book]:
+    return database.get_series_books(ds, series, qslice)
 
 
 def find_series(ds, name: str) -> schemas.Series:

@@ -21,6 +21,8 @@ use Keywords qw( maybe_add_keyword get_keywords_hash);
 use List::Util qw(uniq);
 use Data::Dumper;
 
+$| = 1;
+
 sub main {
     my $db = DB->new();
 
@@ -37,6 +39,8 @@ sub main {
     my ( $books, $authors, $subjects, $awards, $series, $db_keywords,
         $db_genres )
       = pre_process( $data, $db );
+
+    my $existing = {};
 
     foreach my $book (@$books) {
         my ( $title, $book_authors ) =
@@ -92,7 +96,7 @@ sub main {
 
         if ( exists $book->{series} ) {
             my $book_series = $book->{series};
-            foreach my $s_series (@$book_series) {
+            foreach my $s_series (uniq @$book_series) {
                 my $sid = $series->{$s_series};
                 $db->insert_entry(
                     'book_series',
@@ -117,7 +121,7 @@ sub main {
 
         if ( exists $book->{ddc}{wording} ) {
             my $book_wording = $book->{ddc}{wording};
-            foreach my $word (@$book_wording) {
+            foreach my $word (uniq @$book_wording) {
                 my $wid = $db_keywords->{$word};
                 $db->insert_entry(
                     'book_dewey',
@@ -146,47 +150,53 @@ sub pre_process {
     my $db_genres = get_genres_hash($db);
     my $books;
 
-    foreach my $key ( keys %$data ) {
+    my $seen = {};
+
+    foreach my $key ( sort keys %$data ) {
         my $book = get_hashval( $data, $key );
         push @$books, $book;
         my $author = get_hashval( $book, 'authors' );
         foreach my $writer (@$author) {
             if ( ref $writer ne 'HASH' ) { next; }
+
             my $name = get_hashval( $writer, 'fl' );
             $db_authors = maybe_add_author( $db, $name, $db_authors );
         }
-        if ( exists $book->{subject} ) {
-            my $subjects = collapse_ends( $book->{subject} );
-            foreach my $subject (@$subjects) {
-                $db_subjects = maybe_add_subject( $db, $subject, $db_subjects );
+        if ( exists $book->{subject} ){
+            if (defined $book->{subject}) {
+                my $subjects = collapse_ends($book->{subject} );
+                foreach my $subject (@$subjects) {
+                    $db_subjects = maybe_add_subject( $db, $subject, $db_subjects );
+                }
             }
         }
+
         if ( exists $book->{awards} ) {
-            my $awards = $book->{awards};
+            my $awards = collapse_ends( $book->{awards});
             foreach my $award (@$awards) {
                 $db_awards = maybe_add_award( $db, $award, $db_awards );
             }
         }
 
         if ( exists $book->{series} ) {
-            my $series = $book->{series};
+            my $series = collapse_ends($book->{series});
             foreach my $indiv_series (@$series) {
                 $db_series = maybe_add_series( $db, $indiv_series, $db_series );
             }
         }
         if ( exists $book->{ddc}{wording} ) {
-            my $ddc_words = $book->{ddc}{wording};
-            foreach my $ddc_word (@$ddc_words) {
+            my $ddc_words = collapse_ends($book->{ddc}{wording});
+            foreach my $ddc_word (uniq @$ddc_words) {
                 $db_keywords =
                   maybe_add_keyword( $db, $ddc_word, $db_keywords );
             }
         }
-	if (exists $book->{genre}) {
-	    my $genres = $book->{genre};
-	    foreach my $genre (@$genres) {
-		$db_genres = maybe_add_genre($db,$genre, $db_genres);
-	    }
-	}
+        if (exists $book->{genre}) {
+            my $genres = collapse_ends($book->{genre});
+            foreach my $genre (@$genres) {
+                $db_genres = maybe_add_genre($db,$genre, $db_genres);
+            }
+        }
     }
 
     return ( $books, $db_authors, $db_subjects, $db_awards, $db_series,
@@ -207,10 +217,14 @@ sub collapse_ends ($) {
     my ($st) = @_;
 
     my $words = [];
-    if ( ref $st eq 'ARRAY' ) {
+    if ('ARRAY' eq  ref $st  ) {
         foreach my $item (@$st) {
-            foreach my $sub_item (@$item) {
-                push @$words, $sub_item;
+            if ('ARRAY' eq ref $item)  {
+                foreach my $sub_item (@$item) {
+                    push @$words, $sub_item;
+                }
+            } else {
+                push @$words, $item;
             }
         }
     }

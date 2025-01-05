@@ -2,33 +2,39 @@ from sqlalchemy import Select
 
 from app.database import tables, DataBase
 from app import schemas
+from app.util import deps
 
 import logging
 logger = logging.getLogger()
 
 
-def get_all_subjects(ds: DataBase, slice) -> list[schemas.Subject]:
+def get_all_subjects(ds: DataBase,
+                     qslice: deps.Slice) -> list[schemas.Subject]:
     return ds.reader().get_all(
         Select(tables.subjects.c.id, tables.subjects.c.name),
-        schemas.Subject, slice=slice)
+        schemas.Subject, slice=qslice)
 
 
-def get_subject_by_id(ds: DataBase, id: str) -> schemas.Subject:
+def get_subject_by_id(ds: DataBase, id: str,
+                      qslice: deps.Slice) -> schemas.SubjectExtended:
     query = Select(tables.subjects.c.id, tables.subjects.c.name).where(
         tables.subjects.c.id == id)
 
-    return ds.reader().get_one(query, schemas.Subject)
+    subject = ds.reader().get_one(query, schemas.SubjectExtended)
+    subject.books = get_subject_books(ds, id, qslice)
+
+    return subject
 
 
-def get_subject_books(ds: DataBase,
-                      id: str, slice) -> list[schemas.Book]:
+def get_subject_books(ds: DataBase, id: str,
+                      qslice: deps.Slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
                        tables.book_subjects,
                        tables.books.c.id == tables.book_subjects.c.book
                   ).where(tables.book_subjects.c.subject == id)
-    return ds.reader().get_all(query, schemas.Book, slice)
+    return ds.reader().get_all(query, schemas.Book, qslice)
 
 
 def add_subject(ds: DataBase,

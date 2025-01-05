@@ -14,5 +14,10 @@ class Subject(SubjectBase):
     id: UUID4
 
 
+class SubjectBook(BaseModel):
+    id: UUID4
+    title: str
+
+
 class SubjectExtended(Subject):
-    books: Optional[list[UUID4]] = []
+    books: Optional[SubjectBook] = []
