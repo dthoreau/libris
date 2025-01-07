@@ -27,17 +27,13 @@ def get_series_books(ds: DataBase, id: str,
     return ds.reader().get_all(query, schemas.Book, qslice)
 
 
-def get_series_by_id(ds: DataBase, id: str,
-                     qslice: deps.Slice) -> schemas.SeriesExtended:
+def get_series_by_id(ds: DataBase, id: str) -> schemas.Series:
     query = Select(
             tables.series.c.id,
             tables.series.c.name
         ).where(tables.series.c.id == id)
 
-    series = ds.reader().get_one(query, schemas.SeriesExtended)
-    series.books = get_series_books(ds, id, qslice)
-
-    return series
+    return ds.reader().get_one(query, schemas.Series)
 
 
 def add_series(ds: DataBase,

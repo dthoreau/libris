@@ -36,6 +36,11 @@ class BookCreate(BookBase):
     pass
 
 
+class SmallBook(BaseModel):
+    id: UUID4
+    title: str
+
+
 class BookExtended(Book):
     author: list[UUID4] = []
     award: list[UUID4] = []

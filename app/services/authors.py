@@ -8,8 +8,14 @@ def all_authors(datasource, slice) -> list[schemas.Author]:
     return database.get_all_authors(datasource, slice)
 
 
-def get_author(datasource, id, slice: str) -> schemas.AuthorExtended:
-    return database.get_author_by_id(datasource, id, slice)
+def get_author(datasource, id, qslice) -> schemas.AuthorExtended:
+    author = database.get_author_by_id(datasource, id)
+
+    return schemas.AuthorExtended(
+        name=author.name,
+        id=author.id,
+        books=[schemas.SmallBook(id=book.id, title=book.title) for book
+               in database.get_author_books(datasource, id, qslice)])
 
 
 def add_author(datasource,
@@ -19,7 +25,7 @@ def add_author(datasource,
 
 
 def get_author_books(datasource, id: str,
-                     slice) -> list[schemas.AuthorBook]:
+                     slice) -> list[schemas.Book]:
     return database.get_author_books(datasource, id, slice)
 
 

@@ -17,8 +17,8 @@ def get_all_genres(ds: DataBase,
     )
 
 
-def get_genre_books(ds: DataBase,
-                    id: str, qslice: deps.Slice) -> list[schemas.Book]:
+def get_genre_books(ds: DataBase, id: str,
+                    qslice: deps.Slice) -> list[schemas.Book]:
     query = Select(tables.books.c.id,
                    tables.books.c.title
                    ).join(
@@ -28,16 +28,12 @@ def get_genre_books(ds: DataBase,
     return ds.reader().get_all(query, schemas.Book, qslice)
 
 
-def get_genre_by_id(ds: DataBase, id: str,
-                    qslice: deps.Slice) -> schemas.GenreExtended:
+def get_genre_by_id(ds: DataBase, id: str) -> schemas.Genre:
     query = Select(
         tables.genres.c.id, tables.genres.c.name).where(
             tables.genres.c.id == id)
 
-    genre = ds.reader().get_one(query, schemas.GenreExtended)
-    genre.books = get_genre_books(ds, id, qslice)
-
-    return genre
+    return ds.reader().get_one(query, schemas.Genre)
 
 
 def add_genre(ds: DataBase,

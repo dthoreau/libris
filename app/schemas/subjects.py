@@ -1,5 +1,5 @@
-from typing import Optional
 from pydantic import BaseModel, UUID4
+from .books import SmallBook
 
 
 class SubjectBase(BaseModel):
@@ -20,4 +20,4 @@ class SubjectBook(BaseModel):
 
 
 class SubjectExtended(Subject):
-    books: Optional[SubjectBook] = []
+    books: list[SmallBook] = []

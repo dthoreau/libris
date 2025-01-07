@@ -14,8 +14,14 @@ def get_award_books(ds, award: str, qslice: deps.Slice) -> list[schemas.Book]:
     return database.get_award_books(ds, award, qslice)
 
 
-def get_award(ds, award: str, qslice: deps.Slice) -> schemas.AwardExtended:
-    return database.get_award_by_id(ds, award, qslice)
+def get_award(ds, id: str, qslice: deps.Slice) -> schemas.AwardExtended:
+    award = database.get_award_by_id(ds, id)
+
+    return schemas.AwardExtended(
+        id=award.id,
+        name=award.name,
+        books=[schemas.SmallBook(id=book.id, title=book.title)
+               for book in database.get_award_books(ds, id, qslice)])
 
 
 def find_award(ds, name: str) -> schemas.Award:

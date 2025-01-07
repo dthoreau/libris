@@ -20,7 +20,7 @@ def get_all_series(ds: deps.DataSource, qslice: deps.Slice) -> \
 
 @router.get("/series/{series}", tags=["Series"])
 def get_series(ds: deps.DataSource, series_id: str,
-               qslice: deps.Slice) -> schemas.Series:
+               qslice: deps.Slice) -> schemas.SeriesExtended:
     return services.get_series(ds, series_id, qslice)
 
 

@@ -10,8 +10,14 @@ def all_subjects(ds, qslice) -> list[schemas.Subject]:
     return database.get_all_subjects(ds, qslice)
 
 
-def get_subject(ds, id: str, qslice: deps.Slice) -> schemas.Subject:
-    return database.get_subject_by_id(ds, id, qslice)
+def get_subject(ds, id: str, qslice: deps.Slice) -> schemas.SubjectExtended:
+    subject = database.get_subject_by_id(ds, id, qslice)
+
+    return schemas.SubjectExtended(
+        name=subject.name,
+        id=subject.id,
+        books=[schemas.SmallBook(id=book.id, title=book.title) for book
+               in database.get_subject_books(ds, id, qslice)])
 
 
 def get_subject_books(ds, id: str, qslice) -> list[schemas.Book]:

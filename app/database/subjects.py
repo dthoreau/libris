@@ -16,14 +16,11 @@ def get_all_subjects(ds: DataBase,
 
 
 def get_subject_by_id(ds: DataBase, id: str,
-                      qslice: deps.Slice) -> schemas.SubjectExtended:
+                      qslice: deps.Slice) -> schemas.Subject:
     query = Select(tables.subjects.c.id, tables.subjects.c.name).where(
         tables.subjects.c.id == id)
 
-    subject = ds.reader().get_one(query, schemas.SubjectExtended)
-    subject.books = get_subject_books(ds, id, qslice)
-
-    return subject
+    return ds.reader().get_one(query, schemas.Subject)
 
 
 def get_subject_books(ds: DataBase, id: str,

@@ -126,5 +126,4 @@ def create_pivot(table_name, left, left_name, right, right_name):
                   sa.ForeignKey(right_name), nullable=False),
         sa.UniqueConstraint(left, right))
 
-
     return table

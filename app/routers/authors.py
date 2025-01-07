@@ -42,5 +42,5 @@ def update_author():
 
 @router.get("/authors/{author_id}/books", tags=["Authors"])
 def get_author_books(ds: deps.DataSource, id: str,
-                     qslice: deps.Slice) -> list[schemas.AuthorBook]:
+                     qslice: deps.Slice) -> list[schemas.Book]:
     return services.get_author_books(ds, id, qslice)

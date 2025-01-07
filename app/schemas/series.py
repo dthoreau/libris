@@ -1,5 +1,5 @@
-from typing import Optional
 from pydantic import BaseModel, UUID4
+from .books import SmallBook
 
 
 class SeriesBase(BaseModel):
@@ -14,10 +14,5 @@ class Series(SeriesBase):
     id: UUID4
 
 
-class SeriesBook(BaseModel):
-    id: UUID4
-    title: str
-
-
 class SeriesExtended(Series):
-    books: Optional[SeriesBook] = []
+    books: list[SmallBook] = []

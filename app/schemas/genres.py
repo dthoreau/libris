@@ -1,5 +1,6 @@
-from typing import Optional
 from pydantic import BaseModel, UUID4
+
+from .books import SmallBook
 
 
 class GenreBase(BaseModel):
@@ -20,4 +21,4 @@ class GenreBook(BaseModel):
 
 
 class GenreExtended(Genre):
-    books: Optional[GenreBook] = []
+    books: list[SmallBook] = []

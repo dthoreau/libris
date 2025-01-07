@@ -9,7 +9,7 @@ logger = logging.getLogger()
 
 
 def get_award_books(ds: DataBase,
-                    award_id: str, qslice) -> list[schemas.Book]:
+                    award_id: str, qslice: deps.Slice) -> list[schemas.Book]:
     stmt = Select(tables.books.c.id, tables.books.c.title).\
         join(tables.book_awards, tables.books.c.id ==
              tables.book_awards.c.book).\
@@ -17,20 +17,16 @@ def get_award_books(ds: DataBase,
     return ds.reader().get_all(stmt, schemas.Book, qslice)
 
 
-def get_all_awards(ds: DataBase, slice) -> list[schemas.Award]:
+def get_all_awards(ds: DataBase, slice: deps.Slice) -> list[schemas.Award]:
     return ds.reader().get_all(
         Select(tables.awards.c.id, tables.awards.c.name),
         schemas.Award, slice)
 
 
-def get_award_by_id(ds: DataBase, award_id: str,
-                    qslice: deps.Slice) -> schemas.AwardExtended:
+def get_award_by_id(ds: DataBase, award_id: str) -> schemas.Award:
     stmt = Select(tables.awards.c.id, tables.awards.c.name).\
         where(tables.awards.c.id == award_id)
-    award = ds.reader().get_one(stmt, schemas.AwardExtended)
-    award.books = get_award_books(ds, award_id, qslice)
-
-    return award
+    return ds.reader().get_one(stmt, schemas.Award)
 
 
 def add_award(ds: DataBase,

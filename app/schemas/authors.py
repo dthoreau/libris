@@ -1,4 +1,5 @@
 from pydantic import BaseModel, UUID4
+from .books import SmallBook
 
 
 class AuthorBase(BaseModel):
@@ -19,4 +20,4 @@ class AuthorBook(BaseModel):
 
 
 class AuthorExtended(Author):
-    books: list[AuthorBook] = []
+    books: list[SmallBook] = []

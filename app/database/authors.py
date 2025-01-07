@@ -14,15 +14,13 @@ def get_all_authors(ds: DataBase, slice) -> list[schemas.Author]:
     return ds.reader().get_all(stmt, schemas.Author, slice)
 
 
-def get_author_by_id(ds: DataBase, id: str, slice) -> schemas.AuthorExtended:
+def get_author_by_id(ds: DataBase, id: str) -> schemas.Author:
     query = Select(
         tables.authors.c.id,
         tables.authors.c.name).where(
             tables.authors.c.id == id)
 
-    author = ds.reader().get_one(query, schemas.AuthorExtended)
-
-    author.books = get_author_books(ds, id, slice)
+    author = ds.reader().get_one(query, schemas.Author)
 
     return author
 
