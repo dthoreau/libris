@@ -36,8 +36,9 @@ def create_author(ds: deps.DataSource,
 
 
 @router.put("/authors/{author_id}", tags=["Authors"])
-def update_author():
-    return NotImplementedError
+def update_author(ds: deps.DataSource, author_id: str,
+                  update: schemas.AuthorCreate):
+    return services.update_author(ds, author_id, update)
 
 
 @router.get("/authors/{author_id}/books", tags=["Authors"])

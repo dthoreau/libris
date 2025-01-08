@@ -1,5 +1,5 @@
 from .authors import (all_authors, get_author, add_author, find_author,
-                      delete_author, get_author_books)
+                      delete_author, get_author_books, update_author)
 from .awards import (all_awards, get_award_books, get_award, add_award,
                      find_award)
 from .books import get_book, all_books
@@ -17,6 +17,7 @@ __all__ = [
     'find_author',
     'delete_author',
     'get_author_books',
+    'update_author',
 
     'all_awards',
     'get_award_books',

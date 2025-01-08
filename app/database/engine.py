@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Engine, Connection
 from typing import Type, TypeVar
 from pydantic import BaseModel
 
-from sqlalchemy import Select, Insert, Table, Delete
+from sqlalchemy import Select, Insert, Table, Delete, Update
 
 import logging
 logger = logging.getLogger()
@@ -52,10 +52,9 @@ class DataReader(DataBase):
                 model_type: Type[ModelType]) -> ModelType:
 
         try:
-            with self.engine.connect() as dbh:
-                for row in dbh.execute(query):
-                    payload = model_type.model_validate(row._asdict())
-                    return payload
+            for row in self.dbh.execute(query):
+                payload = model_type.model_validate(row._asdict())
+                return payload
         except Exception as e:
             raise e
 
@@ -64,8 +63,6 @@ class DataWriter(DataBase):
     pass
 
     def __enter__(self):
-        self.dbh = self.engine.connect()
-
         return self
 
     def insert(self, table: Table, new_record: BaseModel) -> None:
@@ -78,6 +75,15 @@ class DataWriter(DataBase):
         stmt = Delete(table).where(table.c.id == id)
 
         self.dbh.execute(stmt)
+
+    def update(self, table: Table, id: str, update: object) -> None:
+        stmt = Update(table).where(table.c.id == id).values(
+            update.model_dump())
+
+        try:
+            self.dbh.execute(stmt)
+        except Exception as e:
+            raise e
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.dbh.commit()

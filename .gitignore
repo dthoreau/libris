@@ -2,4 +2,8 @@
 tags
 .venv
 *.pyc
-test-converage/*
+test-converage
+.coverage
+.pre-commit-config.yaml
+.vscode/
+test-coverage/

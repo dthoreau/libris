@@ -49,4 +49,10 @@ def find_author_by_name(ds: DataBase, name: str) -> schemas.Author:
 
 
 def delete_author(ds: DataBase, author_id: int) -> None:
-    ds.writer().delete(tables.authors, author_id)
+    with ds.writer() as dw:
+        dw.delete(tables.authors, author_id)
+
+
+def update_author(ds: DataBase, author_id, update) -> None:
+    with ds.writer() as dw:
+        dw.update(tables.authors, author_id, update)
