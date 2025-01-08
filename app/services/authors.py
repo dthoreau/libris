@@ -37,8 +37,8 @@ def delete_author(datasource, id: str) -> None:
     database.delete_author(datasource, id)
 
 
-def update_author(ds: database.DataBase, author_id, update) -> schemas.Author:
-    with ds.writer() as dw:
-        database.update_author(dw, author_id, update)
+def update_author(ds: database.DataBase,
+                  author_id, update) -> schemas.Author:
+    database.update_author(ds, author_id, update)
 
     return database.get_author_by_id(ds, author_id)
