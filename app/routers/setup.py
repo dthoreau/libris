@@ -14,13 +14,12 @@ from .admin import setup_admin
 
 from . import authors, awards, books, genres, series, subjects
 
-
 libris_version = '0.0.1'
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
-logger.info(f'Bookting Libris v{libris_version}')
-
+logger.info(f'Booting Libris v{libris_version}')
 
 app = FastAPI(
     title="Meis Libris",
@@ -42,9 +41,10 @@ ds = DataBase()
 engine = create_engine(
             "postgresql+psycopg2://libris@localhost/libris",
             echo=True)
+
 admin = Admin(ds.engine, 'Libris')
 
-setup_admin(admin)
+setup_admin(admin, ds)
 
 for router in [authors.router,
                awards.router,

@@ -22,7 +22,7 @@ async def querySlice(skip: int = 0, limit: int = 100):
     return QuerySlice(skip, limit)
 
 
-async def database():
+async def database() -> DataBase:
     return DataBase()
 
 Slice = Annotated[dict, Depends(querySlice)]

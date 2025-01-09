@@ -8,10 +8,17 @@ from app.database import tables, DataBase
 log = logging.getLogger('api')
 
 
-def get_all_authors(ds: DataBase, slice) -> list[schemas.Author]:
+def get_all_authors(ds: DataBase, slice, *,
+                    order: str | None = None,
+                    where: str | None = None) -> list[schemas.Author]:
+    count_authors(ds, where=where)
 
     stmt = Select(tables.authors.c.id, tables.authors.c.name)
-    return ds.reader().get_all(stmt, schemas.Author, slice)
+    if where is not None:
+        stmt = stmt.where(tables.authors.c.name.ilike(f'%{where}%'))
+
+    return ds.reader().get_all(
+        stmt, schemas.Author, slice, order=order)
 
 
 def get_author_by_id(ds: DataBase, id: str) -> schemas.Author:
@@ -56,3 +63,11 @@ def delete_author(ds: DataBase, author_id: int) -> None:
 def update_author(ds: DataBase, author_id, update) -> None:
     with ds.writer() as dw:
         dw.update(tables.authors, author_id, update)
+
+
+def count_authors(ds: DataBase, *, where: str | None = None) -> int:
+    if where is not None:
+        whereclause = [(tables.authors.c.name.ilike(f'%{where}%'))]
+        return ds.reader().count(tables.authors, where=whereclause)
+    else:
+        return ds.reader().count(tables.authors)

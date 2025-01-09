@@ -7,7 +7,7 @@ from .awards import (get_all_awards, get_award_books, get_award_by_id,
 
 from .authors import (get_all_authors, get_author_books, delete_author,
                       get_author_by_id, add_author, find_author_by_name,
-                      update_author)
+                      update_author, count_authors)
 
 from .genres import (get_all_genres, get_genre_books, get_genre_by_id,
                      add_genre, find_genre_by_name)
@@ -32,6 +32,7 @@ __all__ = ['DataBase',
            'find_author_by_name',
            'delete_author',
            'update_author',
+           'count_authors',
 
            'get_all_awards',
            'get_award_books',
