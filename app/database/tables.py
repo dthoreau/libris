@@ -101,3 +101,19 @@ books = Table(
     Column('publication', String(), nullable=True),
     Column('publication_date', String(), nullable=True),
 )
+
+
+def metadata() -> dict[str, Table]:
+    meta_obj = {
+        'authors': authors,
+        'books': books,
+        'genres': genres,
+        'series': series,
+        'subjects': subjects,
+        'book_genres': book_genres,
+        'book_series': book_series,
+        'book_subjects': book_subjects,
+        'book_authors': book_authors,
+       }
+
+    return meta_obj

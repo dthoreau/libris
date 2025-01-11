@@ -62,7 +62,7 @@ __all__ = ['DataBase',
            'get_all_books',
 
            # ----- database routines
-           'get_one', 'get_all', 'insert',
+           'get_one', 'get_all', 'insert', 'get_fields',
 
            # ----- table names
            'book_authors', 'book_awards', 'books', 'authors', 'awards',

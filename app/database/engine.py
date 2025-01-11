@@ -5,8 +5,10 @@ from pydantic import BaseModel
 from sqlalchemy import (Select, Insert, Delete, Update,
                         Table, desc, BinaryExpression)
 
+from . import tables
+
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('engine')
 
 ModelType = TypeVar('ModelType', bound=BaseModel)
 
@@ -14,6 +16,7 @@ ModelType = TypeVar('ModelType', bound=BaseModel)
 class DataBase(object):
     engine: Engine
     dbh: Connection
+    metadata: dict[str, Table]
 
     def __init__(self) -> None:
         logger.info('Connecting...')
@@ -21,6 +24,7 @@ class DataBase(object):
             "postgresql+psycopg2://libris@localhost/libris",
             echo=False)
 
+        self.metadata = tables.metadata()
         self.dbh = self.engine.connect()
 
     def get_engine(self) -> Engine:
@@ -36,22 +40,24 @@ class DataBase(object):
 class DataReader(DataBase):
     pass
 
+    def get_fields(self, *, fields, where, order, qslice):
+        stmt = Select(*fields)
+        if where is not None:
+            stmt = stmt.where(fields[1].ilike(f'%{where}%'))
+        stmt = make_order(stmt, order, qslice)
+
+        return self.dbh.execute(stmt)
+
     def get_all(self,
                 query: Select,
                 model_type: Type[ModelType],
-                slice: object, *,
+                qslice: object, *,
                 order: str | None = None) -> list[ModelType]:
         collection: list[ModelType] = []
         logger.info(f'DB> SELECT all {model_type}')
 
-        if order is not None:
-            field, otype = order[0].split()
-            if otype == 'desc':
-                query = query.order_by(desc(field))
-            else:
-                query = query.order_by(field)
+        query = make_order(query, order, qslice)
 
-        query = query.limit(slice.limit).offset(slice.skip)
         for row in self.dbh.execute(query):
             temp = model_type.model_validate(row._asdict())
             collection.append(temp)
@@ -112,3 +118,14 @@ class DataWriter(DataBase):
     def __exit__(self, exc_type, exc_val, exc_tb):
         logger.info('DB> Autocommit')
         self.dbh.commit()
+
+
+def make_order(stmt: Select, orderlist, qslice):
+    if orderlist is not None:
+        field, otype = orderlist[0].split()
+        if otype == 'desc':
+            stmt = stmt.order_by(desc(field))
+        else:
+            stmt = stmt.order_by(field)
+    stmt = stmt.limit(qslice.limit).offset(qslice.skip)
+    return stmt
