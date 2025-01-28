@@ -38,7 +38,7 @@ class Genre(Base):
     name: Mapped[str]
 
 
-def setup_admin(admin: Admin, ds: deps.DataBase):
+def setup_admin(admin: Admin, ds: deps.DataBase) -> None:
     admin.add_view(ExtendModelView(
         ds, 'author', name='Author', label='Authors',
         icon='fa-regular fa-user', want_fields=('id', 'name'),

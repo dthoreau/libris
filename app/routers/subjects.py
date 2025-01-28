@@ -28,12 +28,6 @@ def get_subject_books(ds: deps.DataSource, qslice: deps.Slice,
     return services.get_subject_books(ds, subject, qslice)
 
 
-@router.get("/subjects/{subject_id}", tags=["Subjects"])
-def get_subject_by_id():
-    return services.get_subject
-    return NotImplementedError
-
-
 @router.delete("/subjects/{subject_id}", tags=["Subjects"])
 def delete_subject():
     return NotImplementedError

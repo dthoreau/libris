@@ -24,7 +24,7 @@ def get_author_by_id(ds: deps.DataSource, qslice: deps.Slice,
 
 
 @router.delete("/authors/{author_id}", tags=["Authors"])
-def delete_author(ds: deps.DataSource, id: str):
+def delete_author(ds: deps.DataSource, id: str) -> None:
     services.delete_author(ds, id)
 
 
@@ -37,7 +37,7 @@ def create_author(ds: deps.DataSource,
 
 @router.put("/authors/{author_id}", tags=["Authors"])
 def update_author(ds: deps.DataSource, author_id: str,
-                  update: schemas.AuthorCreate):
+                  update: schemas.AuthorCreate) -> schemas.Author:
     return services.update_author(ds, author_id, update)
 
 

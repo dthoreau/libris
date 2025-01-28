@@ -8,8 +8,6 @@ from starlette_admin.contrib.sqla import Admin
 
 from traceback import print_exception
 
-from sqlalchemy import create_engine
-
 from .admin import setup_admin
 
 from . import authors, awards, books, genres, series, subjects
@@ -38,9 +36,6 @@ async def catch_exceptions_middleware(request: Request, call_next):
 app.middleware('http')(catch_exceptions_middleware)
 
 ds = DataBase()
-engine = create_engine(
-            "postgresql+psycopg2://libris@localhost/libris",
-            echo=True)
 
 admin = Admin(ds.engine, 'Libris')
 
