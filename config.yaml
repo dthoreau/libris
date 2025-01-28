@@ -1,0 +1,3 @@
+- database:
+  connection: postgresql+psycopg2://libris@localhost/libris
+

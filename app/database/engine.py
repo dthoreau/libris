@@ -8,6 +8,8 @@ from sqlalchemy import (Select, Insert, Delete, Update,
 from . import tables
 
 import logging
+import yaml
+
 logger = logging.getLogger('engine')
 
 ModelType = TypeVar('ModelType', bound=BaseModel)
@@ -19,10 +21,17 @@ class DataBase(object):
     metadata: dict[str, Table]
 
     def __init__(self) -> None:
+
+        with open('config.yaml') as config:
+            try:
+                config = yaml.safe_load(config)
+                connection_string = config[0]['connection']
+
+            except Exception as e:
+                raise e
+
         logger.info('Connecting...')
-        self.engine = create_engine(
-            "postgresql+psycopg2://libris@localhost/libris",
-            echo=False)
+        self.engine = create_engine(connection_string, echo=False)
 
         self.metadata = tables.metadata()
         self.dbh = self.engine.connect()
