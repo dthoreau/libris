@@ -1,6 +1,7 @@
 from .engine import DataBase
 
-from .books import get_book_by_id, get_all_books
+from .books import (get_book_by_id, get_all_books, add_author_to_book,
+                    remove_author_from_book)
 
 from .awards import (get_all_awards, get_award_books, get_award_by_id,
                      add_award, find_award_by_name)
@@ -60,6 +61,8 @@ __all__ = ['DataBase',
 
            'get_book_by_id',
            'get_all_books',
+           'add_author_to_book',
+           'remove_author_from_book',
 
            # ----- database routines
            'get_one', 'get_all', 'insert', 'get_fields',

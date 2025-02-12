@@ -101,10 +101,14 @@ class DataWriter(DataBase):
     def __enter__(self):
         return self
 
-    def insert(self, table: Table, new_record: BaseModel) -> None:
+    def insert(self, table: Table,
+               new_record: BaseModel | dict[str, str]) -> None:
         logger.info(f'DB> Insert: {table=}')
-        stmt = Insert(table).values(
-            new_record.model_dump())  # type: ignore[misc]
+        if type(new_record) is dict:
+            stmt = Insert(table).values([new_record])
+        else:
+            stmt = Insert(table).values(
+                new_record.model_dump())  # type: ignore[misc]
 
         self.dbh.execute(stmt)
 

@@ -31,3 +31,14 @@ def get_book_by_id(ds: DataBase, book_id: str) -> schemas.BookDetail:
         tables.books.c.publication_date,
     ).where(tables.books.c.id == book_id)
     return ds.reader().get_one(query, schemas.Book)
+
+
+def add_author_to_book(ds: DataBase, book: str, author: str) -> None:
+    temp_dict = {'book': book, 'author': author}
+    with ds.writer() as dw:
+        dw.insert(tables.book_authors, temp_dict)
+
+
+def remove_author_from_book(ds: DataBase, book: str,
+                            author: str) -> None:
+    pass
