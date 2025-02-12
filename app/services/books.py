@@ -19,4 +19,4 @@ def add_author_to_book(ds, id: str, author: str) -> None:
 
 
 def remove_author_from_book(ds, id: str, author: str) -> None:
-    database.remove_author_from_book(ds, id, str)
+    database.remove_author_from_book(ds, id, author)

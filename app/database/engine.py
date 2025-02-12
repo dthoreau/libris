@@ -118,6 +118,20 @@ class DataWriter(DataBase):
 
         self.dbh.execute(stmt)
 
+    # TODO this doesn't actually work, using run_update_stmt instead
+    def delete_pivot_entry(self, table: Table,
+                           record: dict[str, str]) -> None:
+        logger.info(f'DB> Delete from pivot {table} {record}')
+        stmt = Delete(table).where([record])
+
+        logger.info(stmt)
+        self.dbh.execute(stmt)
+
+    def run_update_stmt(self, stmt) -> int:
+        result = self.dbh.execute(stmt)
+
+        return result.rowcount
+
     def update(self, table: Table, id: str, update: object) -> None:
         logger.info(f'DB> UPDATE {table} {id=}')
         stmt = Update(table).where(table.c.id == id).values(

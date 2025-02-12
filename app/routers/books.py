@@ -27,8 +27,7 @@ def add_author_to_book(ds: deps.DataSource, id: str, author: str) -> None:
     services.add_author_to_book(ds, id, author)
 
 
-@router.delete("/book/{id}/author/{author}")
+@router.delete("/book/{id}/author/{author}", tags=['Books'])
 def remove_author_from_book(ds: deps.DataSource,
                             id: str, author: str) -> None:
-    raise NotImplementedError
-    # TODO services.remove_author_from_book(ds, id, author)
+    services.remove_author_from_book(ds, id, author)

@@ -3,6 +3,8 @@ from sqlalchemy import Select
 from app.database import tables, DataBase
 from app import schemas
 
+from sqlalchemy import Delete
+
 import logging
 logger = logging.getLogger()
 
@@ -41,4 +43,10 @@ def add_author_to_book(ds: DataBase, book: str, author: str) -> None:
 
 def remove_author_from_book(ds: DataBase, book: str,
                             author: str) -> None:
+    with ds.writer() as dw:
+        table = tables.book_authors
+        stmt = Delete(table).where(
+            table.c.book == book).where(table.c.author == author)
+
+        dw.run_update_stmt(stmt)
     pass
