@@ -3,7 +3,11 @@ from .authors import (all_authors, get_author, add_author, find_author,
 from .awards import (all_awards, get_award_books, get_award, add_award,
                      find_award)
 from .books import (get_book, all_books, add_author_to_book,
-                    remove_author_from_book)
+                    remove_author_from_book, add_award_to_book,
+                    remove_award_from_book, add_genre_to_book,
+                    remove_genre_to_book, add_series_to_book,
+                    remove_series_from_book, add_subject_to_book,
+                    remove_subject_from_book)
 from .genres import (all_genres, get_genre, get_genre_books, add_genre,
                      find_genre)
 from .series import (all_series, get_series, get_series_books,
@@ -28,8 +32,6 @@ __all__ = [
 
     'get_book',
     'all_books',
-    'add_author_to_book',
-    'remove_author_from_book',
 
     'all_genres',
     'get_genre',
@@ -48,4 +50,15 @@ __all__ = [
     'get_subject_books',
     'add_subject',
     'find_subject',
+
+    'add_author_to_book',
+    'remove_author_from_book',
+    'add_award_to_book',
+    'remove_award_from_book',
+    'add_genre_to_book',
+    'remove_genre_to_book',
+    'add_series_to_book',
+    'remove_series_from_book',
+    'add_subject_to_book',
+    'remove_subject_from_book',
 ]

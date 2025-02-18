@@ -1,7 +1,11 @@
 from .engine import DataBase
 
 from .books import (get_book_by_id, get_all_books, add_author_to_book,
-                    remove_author_from_book)
+                    remove_author_from_book, add_award_to_book,
+                    remove_award_from_book, add_genre_to_book,
+                    remove_genre_from_book, add_series_to_book,
+                    remove_series_from_book, add_subject_to_book,
+                    remove_subject_from_book)
 
 from .awards import (get_all_awards, get_award_books, get_award_by_id,
                      add_award, find_award_by_name)
@@ -63,6 +67,16 @@ __all__ = ['DataBase',
            'get_all_books',
            'add_author_to_book',
            'remove_author_from_book',
+
+           'add_award_to_book',
+           'remove_award_from_book',
+           'add_genre_to_book',
+           'remove_genre_from_book',
+           'add_series_to_book',
+           'remove_series_from_book',
+           'add_subject_to_book',
+           'remove_subject_from_book',
+
 
            # ----- database routines
            'get_one', 'get_all', 'insert', 'get_fields',

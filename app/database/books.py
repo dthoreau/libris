@@ -49,4 +49,67 @@ def remove_author_from_book(ds: DataBase, book: str,
             table.c.book == book).where(table.c.author == author)
 
         dw.run_update_stmt(stmt)
+
+
+def add_award_to_book(ds: DataBase, book: str, award: str) -> None:
+    temp_dict = {'book': book, 'award': award}
+    with ds.writer() as dw:
+        dw.insert(tables.book_awards, temp_dict)
+
+
+def remove_award_from_book(ds: DataBase, book: str, award: str) -> None:
     pass
+    with ds.writer() as dw:
+        table = tables.book_awards
+        stmt = Delete(table).where(
+            table.c.book == book).where(table.c.award == award)
+
+        dw.run_update_stmt(stmt)
+
+
+def add_genre_to_book(ds: DataBase, book: str, genre: str) -> None:
+    temp_dict = {'book': book, 'genre': genre}
+    with ds.writer() as dw:
+        dw.insert(tables.book_genres, temp_dict)
+
+
+def remove_genre_from_book(ds: DataBase, book: str, genre: str) -> None:
+    pass
+    with ds.writer() as dw:
+        table = tables.book_genres
+        stmt = Delete(table).where(
+            table.c.book == book).where(table.c.genre == genre)
+
+        dw.run_update_stmt(stmt)
+
+
+def add_series_to_book(ds: DataBase, book: str, series: str) -> None:
+    temp_dict = {'book': book, 'series': series}
+    with ds.writer() as dw:
+        dw.insert(tables.book_series, temp_dict)
+
+
+def remove_series_from_book(ds: DataBase, book: str, series: str) -> None:
+    pass
+    with ds.writer() as dw:
+        table = tables.book_series
+        stmt = Delete(table).where(
+            table.c.book == book).where(table.c.series == series)
+
+        dw.run_update_stmt(stmt)
+
+
+def add_subject_to_book(ds: DataBase, book: str, subject: str) -> None:
+    temp_dict = {'book': book, 'subject': subject}
+    with ds.writer() as dw:
+        dw.insert(tables.book_subjects, temp_dict)
+
+
+def remove_subject_from_book(ds: DataBase, book: str, subject: str) -> None:
+    pass
+    with ds.writer() as dw:
+        table = tables.book_subjects
+        stmt = Delete(table).where(
+            table.c.book == book).where(table.c.subjects == subject)
+
+        dw.run_update_stmt(stmt)
