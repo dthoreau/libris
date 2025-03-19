@@ -11,7 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 from uuid import uuid4
 
-from hashlib import blake2b
+from app.util import passwords
 
 
 # revision identifiers, used by Alembic.
@@ -32,14 +32,13 @@ def upgrade() -> None:
         sa.Column('disabled', sa.Boolean, nullable=False, default=False),
     )
 
-    pwd = 'password'
+    pwd = passwords.get_password_hash('password')
 
     op.execute(f"""
         INSERT INTO users (id, username, full_name, email, hashed_password,
                disabled)
             VALUES ('{uuid4()}', 'admin', 'Admin', 'dominic@thoreau.kiwi',
-                    '{blake2b(pwd.encode(encoding='utf-8')).hexdigest()}',  
-                    'false')
+                    '{pwd}',  'false')
     """)
 
 

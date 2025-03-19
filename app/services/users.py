@@ -1,9 +1,7 @@
 import logging
 
 from app import database, schemas
-from app.util import deps
-
-from hashlib import blake2b
+from app.util import deps, passwords
 
 log = logging.getLogger('api')
 
@@ -25,12 +23,11 @@ def enable_user(ds, id) -> None:
 
 
 def create_user(ds, user: schemas.UserCreate) -> schemas.User:
-    pwd = user.password.encode(encoding='utf-8')
     temp = {'username': user.username,
             'email': user.email,
             'full_name': user.full_name,
             'disabled': False,
-            'hashed_password': blake2b(pwd).hexdigest()}
+            'hashed_password': passwords.get_password_hash(user.password)}
     return database.create_user(ds, temp)
 
 
