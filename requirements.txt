@@ -16,3 +16,7 @@ alembic==1.11.2
 requests==2.32.2
 
 fastapi[standard]
+
+sqlacodegen
+setuptools
+psycopg2-binary
