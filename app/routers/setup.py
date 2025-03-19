@@ -10,7 +10,7 @@ from traceback import print_exception
 
 from .admin import setup_admin
 
-from . import authors, awards, books, genres, series, subjects
+from . import authors, awards, books, genres, series, subjects, users
 
 libris_version = '0.0.1'
 
@@ -46,7 +46,8 @@ for router in [authors.router,
                books.router,
                genres.router,
                series.router,
-               subjects.router]:
+               subjects.router,
+               users.router]:
     app.include_router(router)
 
 admin.mount_to(app)

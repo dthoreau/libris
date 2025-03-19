@@ -1,7 +1,7 @@
 from typing import TypeVar
 from pydantic import BaseModel
 from sqlalchemy import (
-    MetaData, Table, Column, UUID, String, ForeignKey)
+    MetaData, Table, Column, UUID, String, ForeignKey, Boolean)
 
 import uuid
 
@@ -85,7 +85,8 @@ book_genres = Table(
 books = Table(
     'books',
     metadata_obj,
-    Column('id', UUID(as_uuid=False), primary_key=True),
+    Column('id', UUID(as_uuid=False), default=uuid.uuid4,
+           primary_key=True),
     Column('title', String(), nullable=False),
     Column('pages', String(), nullable=True),
     Column('original_isbn', String(), nullable=True),
@@ -102,6 +103,17 @@ books = Table(
     Column('publication_date', String(), nullable=True),
 )
 
+users = Table(
+    'users', metadata_obj,
+    Column('id', UUID(as_uuid=False), primary_key=True,
+           default=uuid.uuid4, unique=True),
+    Column('username', String(), nullable=False),
+    Column('email', String(), nullable=False),
+    Column('full_name', String(), nullable=False),
+    Column('hashed_password', String(), nullable=False),
+    Column('disabled', Boolean(),  nullable=False, default=False),
+)
+
 
 def metadata() -> dict[str, Table]:
     meta_obj = {
@@ -114,6 +126,8 @@ def metadata() -> dict[str, Table]:
         'book_series': book_series,
         'book_subjects': book_subjects,
         'book_authors': book_authors,
+
+        'users': users,
        }
 
     return meta_obj

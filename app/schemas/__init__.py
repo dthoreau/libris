@@ -7,6 +7,8 @@ from .genres import Genre, GenreCreate, GenreExtended
 from .series import Series, SeriesCreate, SeriesExtended
 from .subjects import Subject, SubjectCreate, SubjectExtended
 
+from .users import User, UserCreate
+
 
 __all__ = [
     'Author', 'AuthorCreate', 'AuthorExtended',
@@ -31,4 +33,7 @@ __all__ = [
     'Subject',
     'SubjectCreate',
     'SubjectExtended',
+
+    'User',
+    'UserCreate'
 ]

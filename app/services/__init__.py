@@ -14,6 +14,8 @@ from .series import (all_series, get_series, get_series_books,
                      add_series, find_series)
 from .subjects import (all_subjects, get_subject, get_subject_books,
                        add_subject, find_subject)
+from .users import (get_all_users, get_user_by_id, delete_user,
+                    create_user, update_user, enable_user)
 
 __all__ = [
     'all_authors',
@@ -61,4 +63,11 @@ __all__ = [
     'remove_series_from_book',
     'add_subject_to_book',
     'remove_subject_from_book',
+
+    'get_all_users',
+    'get_user_by_id',
+    'delete_user',
+    'create_user',
+    'update_user',
+    'enable_user',
 ]

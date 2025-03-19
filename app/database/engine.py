@@ -134,8 +134,11 @@ class DataWriter(DataBase):
 
     def update(self, table: Table, id: str, update: object) -> None:
         logger.info(f'DB> UPDATE {table} {id=}')
-        stmt = Update(table).where(table.c.id == id).values(
-            update.model_dump())
+        if type(update) is dict:
+            stmt = Update(table).where(table.c.id == id).values(update)
+        else:
+            stmt = Update(table).where(table.c.id == id).values(
+                update.model_dump())
 
         try:
             self.dbh.execute(stmt)

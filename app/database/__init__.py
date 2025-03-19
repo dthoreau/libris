@@ -28,6 +28,9 @@ from .tables import (book_authors, book_awards, book_genres,
                      book_series, book_subjects,  books, authors,
                      awards, series, subjects, genres)
 
+from .users import (get_user_by_id, get_all_users, delete_user, update_user,
+                    create_user, enable_user)
+
 __all__ = ['DataBase',
 
            'get_all_authors',
@@ -77,6 +80,12 @@ __all__ = ['DataBase',
            'add_subject_to_book',
            'remove_subject_from_book',
 
+           'get_user_by_id',
+           'get_all_users',
+           'delete_user',
+           'update_user',
+           'create_user',
+           'enable_user',
 
            # ----- database routines
            'get_one', 'get_all', 'insert', 'get_fields',
