@@ -31,7 +31,7 @@ class DataBase(object):
                 raise e
 
         logger.info('Connecting...')
-        self.engine = create_engine(connection_string, echo=False)
+        self.engine = create_engine(connection_string, echo=False, )
 
         self.metadata = tables.metadata()
         self.dbh = self.engine.connect()
@@ -60,7 +60,7 @@ class DataReader(DataBase):
     def get_all(self,
                 query: Select,
                 model_type: Type[ModelType],
-                qslice: object, *,
+                *, qslice: object | None = None,
                 order: str | None = None) -> list[ModelType]:
         collection: list[ModelType] = []
         logger.info(f'DB> SELECT all {model_type}')
@@ -75,14 +75,11 @@ class DataReader(DataBase):
     def get_one(self,
                 query: Select,
                 model_type: Type[ModelType]) -> ModelType:
-        logger.info(f'DB> SELECT one {model_type}')
+        logger.info(f'DB> SELECT one {model_type} {query}')
 
-        try:
-            for row in self.dbh.execute(query):
-                payload = model_type.model_validate(row._asdict())
-                return payload
-        except Exception as e:
-            raise e
+        for row in self.dbh.execute(query):
+            payload = model_type.model_validate(row._asdict())
+            return payload
 
     def count(self, table: Table, *,
               where: list[BinaryExpression] | None = None) -> int:
@@ -99,24 +96,35 @@ class DataWriter(DataBase):
     pass
 
     def __enter__(self):
+        self.dbh.begin()
         return self
 
     def insert(self, table: Table,
-               new_record: BaseModel | dict[str, str]) -> None:
+               new_record: BaseModel | dict[str, str]) -> any:
         logger.info(f'DB> Insert: {table=}')
         if type(new_record) is dict:
             stmt = Insert(table).values([new_record])
         else:
             stmt = Insert(table).values(
-                new_record.model_dump())  # type: ignore[misc]
+                new_record.model_dump(exclude_none=True))  # type: ignore[misc]
 
-        self.dbh.execute(stmt)
+        try:
+            crsr = self.dbh.execute(stmt)
+        except Exception as e:
+            self.dbh.rollback()
+            logger.error(f'Error inserting into {table}: {e}')
+            raise e
+        return crsr.inserted_primary_key[0]  # type: ignore[return-value]
 
     def delete(self, table: Table, id: str) -> None:
         logger.info(f'DB> Delete from {table} {id=}')
         stmt = Delete(table).where(table.c.id == id)
-
-        self.dbh.execute(stmt)
+        try:
+            self.dbh.execute(stmt)
+        except Exception as e:
+            self.dbh.rollback()
+            logger.error(f'Error deleting {table} {id}: {e}')
+            raise e
 
     # TODO this doesn't actually work, using run_update_stmt instead
     def delete_pivot_entry(self, table: Table,
@@ -125,7 +133,12 @@ class DataWriter(DataBase):
         stmt = Delete(table).where([record])
 
         logger.info(stmt)
-        self.dbh.execute(stmt)
+        try:
+            self.dbh.execute(stmt)
+        except Exception as e:
+            self.dbh.rollback()
+            logger.error(f'Error deleting pivot entry: {e}')
+            raise e
 
     def run_update_stmt(self, stmt) -> int:
         result = self.dbh.execute(stmt)
@@ -143,6 +156,8 @@ class DataWriter(DataBase):
         try:
             self.dbh.execute(stmt)
         except Exception as e:
+            self.dbh.rollback()
+            logger.error(f'Error updating {table} {id}: {e}')
             raise e
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -157,5 +172,8 @@ def make_order(stmt: Select, orderlist, qslice):
             stmt = stmt.order_by(desc(field))
         else:
             stmt = stmt.order_by(field)
-    stmt = stmt.limit(qslice.limit).offset(qslice.skip)
+
+    if qslice is not None:
+        stmt = stmt.limit(qslice.limit).offset(qslice.skip)
+
     return stmt
